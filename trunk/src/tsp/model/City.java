@@ -1,21 +1,21 @@
 package tsp.model;
 
 public class City {
-	int x;
-	int y;
+	double x;
+	double y;
 	int city;
 	
-	public City(int n, int x, int y){
+	public City(int n, double x, double y){
 		this.x = x;
 		this.y = y;
 		this.city = n;
 	}
 
-	public int getX() {
+	public double getX() {
 		return x;
 	}
 
-	public int getY() {
+	public double getY() {
 		return y;
 	}
 
@@ -24,6 +24,22 @@ public class City {
 	}
 	
 	public static int distance(City c1, City c2){
-		return 0;
+		
+		double sqx = c1.x - c2.x;
+		double sqy = c1.y - c2.y;
+		
+		double sq = sqx*sqx + sqy*sqy;
+		int res = (int)(Math.sqrt(sq));
+		
+		return res;
+	}
+	
+	public static int distance_sqaured(City c1, City c2){
+		double sqx = c1.x - c2.x;
+		double sqy = c1.y - c2.y;
+		
+		double sq = sqx*sqx + sqy*sqy;
+		
+		return (int)(sq);
 	}
 }
