@@ -8,22 +8,22 @@ public class Edge {
 	
 	int length;
 	
-	protected Edge(City depart, City arrive){
+	public Edge(City depart, City arrive){
 		this.depart = depart;
 		this.arrive = arrive;
 		
 		length = City.distance(depart, arrive);
 	}
 	
-	protected City getDepart() {
+	public City getDepart() {
 		return depart;
 	}
 
-	protected City getArrive() {
+	public City getArrive() {
 		return arrive;
 	}
 
-	protected int getLength() {
+	public int getLength() {
 		return length;
 	}
 }
