@@ -8,11 +8,19 @@ public class Edge {
 	
 	int length;
 	
+	int squared_length;
+	
 	public Edge(City depart, City arrive){
 		this.depart = depart;
 		this.arrive = arrive;
 		
-		length = City.distance(depart, arrive);
+		double sqx = this.depart.getX() - this.arrive.getX();
+		double sqy = this.depart.getY() - this.arrive.getY();
+		
+		double sq = sqx*sqx + sqy*sqy;
+		squared_length = (int)(sq);
+		
+		length = (int) Math.sqrt(sq);
 	}
 	
 	public City getDepart() {
@@ -25,5 +33,21 @@ public class Edge {
 
 	public int getLength() {
 		return length;
+	}
+	
+	public int getSquaredLength() {
+		return squared_length;
+	}
+
+	public boolean equals(Object arg0) {
+		
+		Edge e = (Edge)(arg0);
+		
+		if((depart==e.depart && arrive==e.arrive) || 
+				(depart==e.arrive && arrive==e.depart))
+			return true;
+		
+		return false;
+		
 	}
 }
