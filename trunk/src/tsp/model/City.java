@@ -34,7 +34,7 @@ public class City {
 		return res;
 	}
 	
-	public static int distance_sqaured(City c1, City c2){
+	public static int distance_squared(City c1, City c2){
 		double sqx = c1.x - c2.x;
 		double sqy = c1.y - c2.y;
 		
