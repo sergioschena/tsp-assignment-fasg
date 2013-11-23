@@ -7,9 +7,13 @@ import tsp.model.Solution;
 
 public class Vettore implements Solution {
 	
-	Map<City,Integer> appoggio; // in questo vettore memorizzo l'associazione tra la cità e la sua posizione nel vettore
+	Map<City,Integer> appoggio; // in questo vettore memorizzo l'associazione tra la cità e la sua posizione nella soluzione
     City[] soluzione;
     int costo;
+    public Vettore(){
+    	
+    }
+    
 	@Override
 	public City next(City c) {
 		// TODO Auto-generated method stub
