@@ -16,20 +16,23 @@ public class TSTabuList {
 	 * key: tenure
 	 * value: set of moves with <key> tenure 
 	*/
-	Map<Integer, HashSet<Move>> tabuList;
+	private Map<Integer, HashSet<Move>> tabuList;
 	/** tabu moves */
-	HashSet<Move> tabus;
+	private HashSet<Move> tabus;
 	/** tabu tenure */
-	int currentTenure;
+	private int currentTenure;
+	/** aspiration criteria */
+	private AspirationCriteria criteria;
 	
-	public TSTabuList(){
-		this(DEFAULT_START_TENURE);
+	public TSTabuList(AspirationCriteria criteria){
+		this(criteria,DEFAULT_START_TENURE);
 	}
 	
-	public TSTabuList(int startTenure){
+	public TSTabuList(AspirationCriteria criteria, int startTenure){
 		tabus = new HashSet<Move>();
 		tabuList = new HashMap<Integer,HashSet<Move>>();
 		currentTenure = startTenure;
+		this.criteria = criteria;
 	}
 	
 	
@@ -66,7 +69,7 @@ public class TSTabuList {
 	public boolean isTabu(Move m){
 		
 		if(tabus.contains(m)){
-			return true;
+			return !criteria.isSatisfiedBy(m);
 		}
 		
 		return false;
@@ -110,7 +113,7 @@ public class TSTabuList {
 		}
 	}
 	
-	/** toString for debuggind */
+	/** toString for debugging */
 	public String toString(){
 		StringBuffer sb = new StringBuffer();
 		for(Integer k : tabuList.keySet()){
