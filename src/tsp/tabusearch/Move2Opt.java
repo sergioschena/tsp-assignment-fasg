@@ -4,7 +4,7 @@ import tsp.model.City;
 import tsp.model.Solution;
 
 /** Implements 2-opt move */ 
-public class Move2Opt implements Move  {
+public class Move2Opt implements Move {
 	
 	City a;
 	City b;
@@ -22,29 +22,39 @@ public class Move2Opt implements Move  {
 		eval = Integer.MAX_VALUE;
 	}
 	
-	/** Evaluate the delta of the move 
-	 * if negative => good move
-	 * else not improve (it must be thrown out)
+	/** 
+	 * Return the delta of the move
+	 * evaluate the delta if never done
 	 */
 	@Override
 	public int evaluate(){
 		
 		if (eval == Integer.MAX_VALUE){
-			
-			int ab = objFunc.cost(a,b);
-			int bc = objFunc.cost(b,c);
-			int cd = objFunc.cost(c,d);
-			int ad = objFunc.cost(a,d);
-			
-			eval = Move2Opt.evaluation(ab, bc, cd, ad);
+			return updateEvaluation();
+		}else{
+			return eval;
 		}
+	}
+	
+	/**
+	 * Evaluate the delta of the move
+	 * if negative => good move
+	 * else not an improve => must be thrown
+	 */
+	public int updateEvaluation(){
+		int ab = objFunc.cost(a,b);
+		int bc = objFunc.cost(b,c);
+		int cd = objFunc.cost(c,d);
+		int ad = objFunc.cost(a,d);
 		
+		eval = Move2Opt.evaluation(ab, bc, cd, ad);
+	
 		return eval;
 	}
 	
 	/** static method for evaluation process */
 	public static int evaluation(int ab, int bc, int cd, int ad){
-		return ab + cd - bc - ad;
+		return  bc + ad - ab - cd;
 	}
 
 	
@@ -53,6 +63,12 @@ public class Move2Opt implements Move  {
 		//TODO implementare aggiornamento della soluzione con la mossa corrente
 		// aggiornare interfaccia Solution???
 		// deve clonare???
+		
+	}
+	
+	public void operateOn(TSSolution sol) {
+		sol.flipEdge(a, b, c, d);
+		sol.updateLength(eval);
 	}
 	
 	/** This method must be override the Object class one. Needed in tabu list class */
@@ -73,9 +89,21 @@ public class Move2Opt implements Move  {
 	@Override
 	public String toString(){
 		StringBuffer sb = new StringBuffer("Replace ");
-		sb.append("("+a.getCity()+","+b.getCity()+") with ");
-		sb.append("("+c.getCity()+","+d.getCity()+")");
+		sb.append("("+a.getCity()+","+b.getCity()+") and ");
+		sb.append("("+d.getCity()+","+c.getCity()+")");
+		sb.append(" with ("+a.getCity()+","+d.getCity()+") and ");
+		sb.append("("+b.getCity()+","+c.getCity()+")");
 		return sb.toString();
+	}
+	
+	/** Clone method. Used by MoveManager */
+	public Object clone(){
+		try {
+			return super.clone();
+		} catch (CloneNotSupportedException e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 
 }
