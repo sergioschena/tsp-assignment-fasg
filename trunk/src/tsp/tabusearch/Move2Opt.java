@@ -67,8 +67,9 @@ public class Move2Opt implements Move {
 	}
 	
 	public void operateOn(TSSolution sol) {
-		sol.flipEdge(a, b, c, d);
-		sol.updateLength(eval);
+		//sol.flipEdge(a, b, c, d);
+		sol.flip(a, d);
+		objFunc.evaluate(sol);
 	}
 	
 	/** This method must be override the Object class one. Needed in tabu list class */
