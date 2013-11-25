@@ -3,6 +3,7 @@ package tsp.tabusearch;
 import java.util.Date;
 
 import tsp.model.City;
+import tsp.model.CityManager;
 
 /** Test class for tabu list features 
  * NOT NEEDED 
@@ -90,6 +91,7 @@ public class Test {
 		c[8] = new City(9, 1, 1);
 		c[9] = new City(10, 12, 5);
 		
+		CityManager cm = new CityManager(c);
 		
 		TSObjectiveFunction of = new TSObjectiveFunction(c);
 		TSTabuList tl = new TSTabuList(new FalseAspCrit(),3);
