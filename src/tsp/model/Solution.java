@@ -1,6 +1,6 @@
 package tsp.model;
 
-public interface Solution {
+public interface Solution extends Cloneable {
 	
 	public City next(City c);
 	

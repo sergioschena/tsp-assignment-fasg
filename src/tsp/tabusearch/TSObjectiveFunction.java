@@ -36,9 +36,6 @@ public class TSObjectiveFunction {
 	}
 	
 	public int evaluate(TSSolution s){
-		if(s.length() != Integer.MAX_VALUE)
-			return s.length();
-
 		int val = 0;
 		City start = s.startFrom();
 		City act = start;

@@ -1,5 +1,7 @@
 package tsp.tabusearch;
 
+import java.util.Date;
+
 import tsp.model.City;
 
 /** Test class for tabu list features 
@@ -94,18 +96,34 @@ public class Test {
 		TSMoveManager mm = new TSMoveManager(tl, of);
 		
 		System.out.println(of);
-		TSSolution start = new TSSolution(c);
-		System.out.println(of.evaluate(start));
+		TSSolution curr = new TSSolution(c);
+		TSSolution best = (TSSolution) curr.clone();
+		System.out.println(of.evaluate(curr));
 		
-		System.out.println(start+" -> "+of.evaluate(start));
-		Move2Opt m = mm.nextMove(start);
-		while(m.eval < 0){
-			System.out.println(m);
-			m.operateOn(start);
-			System.out.println(start+" -> "+of.evaluate(start));
+		long start = System.currentTimeMillis();
+		System.out.println(curr+" -> "+of.evaluate(curr));
+		Move2Opt m = mm.nextMove(curr);
+		int cnt = 5;
+		int prev = Integer.MAX_VALUE;
+		while(cnt > 0){
+			System.out.println(m+" "+m.eval);
+			m.operateOn(curr);
+			if(curr.length() < prev ){
+				cnt = 10;
+				prev = curr.length();
+				best = (TSSolution) curr.clone();
+			}else{
+				cnt--;
+			}
+				
+			System.out.println(curr+" -> "+curr.length());
 			tl.addTabu(m);
-			m = mm.nextMove(start);
+			m = mm.nextMove(curr);
 		}
+		long end = System.currentTimeMillis();
+		double secs = (end - start) / 1000.0;
+		System.out.println(best+" -> "+best.length());
+		System.out.println(secs);
 		
 
 	}

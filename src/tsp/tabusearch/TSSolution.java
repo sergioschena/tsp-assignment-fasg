@@ -62,20 +62,15 @@ public class TSSolution implements Solution {
 
 	@Override
 	public void flip(City a, City b) {
-		// TODO Auto-generated method stub
+		int src = pos(next(a));
+		int dst = pos(b);
 		
-	}
-	
-	public void flipEdge(City a, City b, City c, City d){
-		int pb = pos(b);
-		int pd = pos(d);
-		
-		int cnt = (pb<pd ? pd-pb-1: size-pd-pb-1)/2; 
+		int cnt = (src<dst ? dst-src-1: size-dst-src-1)/2; 
 		for(; cnt >= 0; cnt--){
-			swap(pb,pd);
-			pb = (pb+1)%size;
-			pd = (pd-1)%size;
-		}
+			swap(src,dst);
+			src = (src+1)%size;
+			dst = (size+dst-1)%size;
+		}		
 	}
 	
 	private int pos(City c){
@@ -111,9 +106,23 @@ public class TSSolution implements Solution {
 	public String toString(){
 		StringBuffer sb = new StringBuffer("Tour:");
 		for(City c : cities){
-			sb.append(" "+c.getCity()+" ("+c.getX()+", "+c.getY()+") ");
+			//sb.append(" "+c.getCity()+" ("+c.getX()+", "+c.getY()+") ");
+			sb.append(" "+c.getCity()+" - ");
 		}
 		return sb.toString();
+	}
+	
+	@Override
+	public Object clone(){
+		try {
+			TSSolution cl = (TSSolution) super.clone();
+			cl.cities = cities.clone();
+			return cl;
+		} catch (CloneNotSupportedException e) {
+			e.printStackTrace();
+			return null;
+		}
+		
 	}
 
 }
