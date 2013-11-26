@@ -42,4 +42,9 @@ public class City {
 		
 		return (int)(sq);
 	}
+	
+	public boolean equals(Object o){
+		City oth = (City) o;
+		return oth.city == this.city;
+	}
 }

@@ -1,6 +1,7 @@
 package tsp.tabusearch;
 
 import java.util.Date;
+import java.util.Random;
 
 import tsp.model.City;
 import tsp.model.CityManager;
@@ -14,7 +15,7 @@ public class Test {
 	
 	public static void main(String[] args) {
 		
-		testTabuList();
+		//testTabuList();
 		testMoveManager();
 		
 	}
@@ -26,7 +27,7 @@ public class Test {
 		}
 		
 		TSTabuList tl = new TSTabuList(new FalseAspCrit(),3);
-		TSObjectiveFunction of = new TSObjectiveFunction(c);
+		TSObjectiveFunction of = new TSObjectiveFunction(new CityManager(c));
 		
 		Move m1 = new Move2Opt(c[0], c[1], c[2], c[3], of);
 		Move m2 = new Move2Opt(c[0], c[1], c[2], c[3], of);
@@ -79,6 +80,7 @@ public class Test {
 	}
 	
 	public static void testMoveManager(){
+		/*
 		City[] c = new City[10];
 		c[0] = new City(1, 6, 10);
 		c[1] = new City(2, 18, 4);
@@ -90,14 +92,25 @@ public class Test {
 		c[7] = new City(8, 5, 15);
 		c[8] = new City(9, 1, 1);
 		c[9] = new City(10, 12, 5);
+		*/
 		
-		CityManager cm = new CityManager(c);
+		City[] c = CityGenerator.randomCities(1000, 200, 200);
 		
-		TSObjectiveFunction of = new TSObjectiveFunction(c);
+		//long start = System.currentTimeMillis();
+		CityManager cm = new CityManager(c,20);
+		//long end = System.currentTimeMillis();
+		//System.out.println((end-start)/1000.0);
+		
+		//start = System.currentTimeMillis();
+		//cm = new CityManager(c);
+		//end = System.currentTimeMillis();
+		//System.out.printlsn((end-start)/1000.0);
+		
+		TSObjectiveFunction of = new TSObjectiveFunction(cm);
 		TSTabuList tl = new TSTabuList(new FalseAspCrit(),3);
-		TSMoveManager mm = new TSMoveManager(tl, of);
+		TSMoveManager mm = new TSMoveManager(tl, of,cm);
 		
-		System.out.println(of);
+		/*
 		TSSolution curr = new TSSolution(c);
 		TSSolution best = (TSSolution) curr.clone();
 		System.out.println(of.evaluate(curr));
@@ -108,17 +121,17 @@ public class Test {
 		int cnt = 5;
 		int prev = Integer.MAX_VALUE;
 		while(cnt > 0){
-			System.out.println(m+" "+m.eval);
+			//System.out.println(m+" "+m.eval);
 			m.operateOn(curr);
 			if(curr.length() < prev ){
-				cnt = 10;
+				cnt = 5;
 				prev = curr.length();
 				best = (TSSolution) curr.clone();
 			}else{
 				cnt--;
 			}
 				
-			System.out.println(curr+" -> "+curr.length());
+			//System.out.println(curr+" -> "+curr.length());
 			tl.addTabu(m);
 			m = mm.nextMove(curr);
 		}
@@ -126,8 +139,55 @@ public class Test {
 		double secs = (end - start) / 1000.0;
 		System.out.println(best+" -> "+best.length());
 		System.out.println(secs);
+		*/
+		
+		TSSolution curr = new TSSolution(c);
+		TSSolution best = (TSSolution) curr.clone();
+		System.out.println(of.evaluate(curr));
+		
+		long start = System.currentTimeMillis();
+		System.out.println(curr+" -> "+of.evaluate(curr));
+		Move2Opt m = mm.nextMoveTrunc(curr);
+		int cnt = 5;
+		int prev = Integer.MAX_VALUE;
+		while(cnt > 0){
+			//System.out.println(m+" "+m.eval);
+			m.operateOn(curr);
+			if(curr.length() < prev ){
+				cnt = 5;
+				prev = curr.length();
+				best = (TSSolution) curr.clone();
+			}else{
+				cnt--;
+			}
+				
+			//System.out.println(curr+" -> "+curr.length());
+			//System.out.println(" -> "+curr.length());
+			tl.addTabu(m);
+			m = mm.nextMoveTrunc(curr);
+		}
+		long end = System.currentTimeMillis();
+		double secs = (end - start) / 1000.0;
+		System.out.println(best+" -> "+best.length());
+		System.out.println(secs);
+		
 		
 
+	}
+	
+	private static class CityGenerator {
+		public static City[] randomCities(int n, double xMax, double yMax){
+			City[] ret = new City[n];
+			
+			for(int i = 0; i < n; i++){
+				Random rGen = new Random();
+				double x = rGen.nextDouble()*xMax;
+				double y = rGen.nextDouble()*yMax;
+				ret[i] = new City(i+1, x, y);
+			}
+			
+			return ret;
+		}
 	}
 	
 	private static class FalseAspCrit implements AspirationCriteria {

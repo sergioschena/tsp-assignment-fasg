@@ -17,7 +17,7 @@ public class TSSolution implements Solution {
 	}
 	
 	public TSSolution(City[] cities) {
-		this.cities = cities;
+		this.cities = cities.clone();
 		this.size = this.cities.length;
 		this.length = Integer.MAX_VALUE;
 	}
@@ -65,7 +65,7 @@ public class TSSolution implements Solution {
 		int src = pos(next(a));
 		int dst = pos(b);
 		
-		int cnt = (src<dst ? dst-src-1: size-dst-src-1)/2; 
+		int cnt = (src<dst ? dst-src-1: size+dst-src-1)/2; 
 		for(; cnt >= 0; cnt--){
 			swap(src,dst);
 			src = (src+1)%size;
