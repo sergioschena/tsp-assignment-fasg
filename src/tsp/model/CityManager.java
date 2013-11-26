@@ -1,21 +1,25 @@
 package tsp.model;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.LinkedList;
 
 public class CityManager {
 	
 	private int[][] distances;
 	private City[] cities;	
 	private City[][] nearest;
-	private int n;
+	public int n;
+	private int maxNeighbors;
 	
 	public CityManager(City[] cities){
-		// TODO: cercare di evitare una cazzo di clone
+		this(cities,cities.length-1);
+	}
+	
+	public CityManager(City[] cities, int K){
 		this.cities = cities.clone();
 		this.n = cities.length;
+		this.maxNeighbors = K;
 		initDistances();
 		initNearest();
 	}
@@ -47,13 +51,15 @@ public class CityManager {
 		//nearest = new HashMap<Integer,City[]>();
 		nearest = new City[n][];
 		
-		City[] toSort;
-		CityComparator cmp;
+		//City[] toSort;
+		//CityComparator cmp;
 		for(City c: cities){
-			cmp = new CityComparator(c.city);
-			toSort = cities.clone();
-			Arrays.sort(toSort,cmp);
-			nearest[c.city-1] = toSort;
+			//cmp = new CityComparator(c.city-1);
+			//toSort = cities.clone();
+			//Arrays.sort(toSort,cmp);
+			//nearest[c.city-1] = toSort;
+					
+			nearest[c.city-1] = bestNearestOf(c);
 		}
 	}
 
@@ -61,7 +67,35 @@ public class CityManager {
 		double xd = a.getX() - b.getX();
 		double yd = a.getY() - b.getY();
 		return (int) Math.sqrt(xd*xd + yd*yd);
-	}	
+	}
+	
+	private City[] bestNearestOf(City c){
+		LinkedList<City> bestNear = new LinkedList<City>();
+		
+		int cIdx = c.city - 1;
+		int dist;
+		boolean onlyAdd = true;
+		CityComparator cmp;
+		
+		for(int i=0; i<this.n; i++){
+			if(i != cIdx){
+				cmp = new CityComparator(c.city-1);
+				dist = distances[cIdx][i];
+				
+				if(onlyAdd){
+					onlyAdd = ((bestNear.size() == (maxNeighbors-1)) ? false : true);
+					bestNear.add(cities[i]);
+					Collections.sort(bestNear, cmp);
+				}else if(distances[cIdx][bestNear.getLast().city-1] > dist){
+					bestNear.removeLast();
+					bestNear.add(cities[i]);
+					Collections.sort(bestNear, cmp);
+				}
+			}
+		}
+		
+		return bestNear.toArray(new City[0]);
+	}
 	
 	private class CityComparator implements Comparator<City>{
 		int src;
@@ -72,11 +106,31 @@ public class CityManager {
 		
 		@Override
 		public int compare(City arg0, City arg1) {
-			int c0 = arg0.city-1;
-			int c1 = arg1.city-1;
-			return (distances[src][c0] - distances[src][c1]);
+			return (distances[src][arg0.city-1] - distances[src][arg1.city-1]);
 		}
 		
+	}	
+	
+	@Override
+	public String toString(){
+		StringBuffer sb = new StringBuffer("Cost Matrix:\n");
+		for(int i = 0; i<n; i++){
+			sb.append((i+1)+"[ ");
+			for(int j = 0; j<n; j++){
+				sb.append(distances[i][j]+ " - ");
+			}
+			sb.append("]\n");
+		}
+		sb.append("Best neighbors: \n");
+		for(int i = 0; i<n; i++){
+			sb.append((i+1)+"[ ");
+			for(int j = 0; j<nearest[i].length; j++){
+				sb.append(nearest[i][j].city+ " - ");
+			}
+			sb.append("]\n");
+		}
+		
+		return sb.toString();
 	}
 
 }

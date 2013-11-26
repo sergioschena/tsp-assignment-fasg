@@ -42,13 +42,19 @@ public class Move2Opt implements Move {
 	 * else not an improve => must be thrown
 	 */
 	public int updateEvaluation(){
-		int ab = objFunc.cost(a,b);
-		int bc = objFunc.cost(b,c);
-		int cd = objFunc.cost(c,d);
-		int ad = objFunc.cost(a,d);
+		if( a == null || b == null || c == null || d == null){
+			
+			eval = Integer.MAX_VALUE;
+			
+		}else{
 		
-		eval = Move2Opt.evaluation(ab, bc, cd, ad);
-	
+			int ab = objFunc.cost(a,b);
+			int bc = objFunc.cost(b,c);
+			int cd = objFunc.cost(c,d);
+			int ad = objFunc.cost(a,d);
+		
+			eval = Move2Opt.evaluation(ab, bc, cd, ad);
+		}
 		return eval;
 	}
 	
@@ -67,9 +73,8 @@ public class Move2Opt implements Move {
 	}
 	
 	public void operateOn(TSSolution sol) {
-		//sol.flipEdge(a, b, c, d);
 		sol.flip(a, d);
-		objFunc.evaluate(sol);
+		sol.updateLength(eval);
 	}
 	
 	/** This method must be override the Object class one. Needed in tabu list class */
