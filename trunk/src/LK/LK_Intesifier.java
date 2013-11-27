@@ -396,7 +396,6 @@ public class LK_Intesifier implements Intensifier {
 							
 							// in base alla posizione di t5 si può decidere come
 							// ricostruire il tour
-							// TODO una volta trovata t6 valutare la chiusura con y3*
 							if(between(current_solution, t2, t5, t3)){
 								//prendendo un qualsiasi arco x con estremo t5 si
 								//ritorna a un tour accettabile
@@ -1353,8 +1352,8 @@ public class LK_Intesifier implements Intensifier {
 	// la creazione di un arco è dipendente dalla direzione
 	private Edge createEdge(City c1, City c2){
 		if(direction)
-			return new Edge(c1,c2);
-		return new Edge(c2,c1);
+			return city_manager.getEdge(c1, c2);
+		return city_manager.getEdge(c2, c1);
 	}
 	
 //------------------------------------------------------------------------------------------
