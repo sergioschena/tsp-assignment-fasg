@@ -2,6 +2,8 @@ package LK;
 
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 
 import tsp.model.*;
@@ -22,8 +24,17 @@ public class LK_Intesifier implements Intensifier {
 	// soluzione corrente
 	private Solution current_solution = null;
 	
+	// città iniziale corrente
+	private City t1_current;
+	
 	// array di città da collegare
 	private City cities[];
+	
+	
+	//TODO gestire la creazione degli archi e delle loro lunghezze
+	
+	// gestore delle città
+	private CityManager city_manager;
 	
 	
 	// set degli archi aggiunti
@@ -38,11 +49,26 @@ public class LK_Intesifier implements Intensifier {
 	//array dei guadagni progressivi
 	private ArrayList<Integer> gains;
 	
-	
 	//flag della direzione
 	// true:  scorrimento dal primo elemento della soluzione all'ultimo      
 	// false: scorrimento inverso
 	private boolean direction = true;
+	
+//------------------------------------------------------------------------------------------
+// Parametri
+//------------------------------------------------------------------------------------------
+	
+	//numero di archi y1 da valutare al massimo
+	// dovrebbe essere uguale a 5 o 6
+	private int max_y1 = 5;
+	
+	//numero di archi y2 da valutare al massimo
+	// dovrebbe essere uguale a 5 o 6
+	private int max_y2 = 5;
+
+	//numero di archi yi da valutare al massimo
+	// dovrebbe essere uguale a 5 o 6
+	private int max_yi = 5;
 	
 //------------------------------------------------------------------------------------------
 // Metodi di ricerca
@@ -78,6 +104,9 @@ public class LK_Intesifier implements Intensifier {
 			x_Edges = new ArrayList<Edge>();
 			y_Edges = new ArrayList<Edge>();
 			gains = new ArrayList<Integer>();
+			
+			//nuova città iniziale
+			t1_current = cities[i];
 			
 			find_improvement(cities[i]);
 		}
@@ -151,7 +180,7 @@ public class LK_Intesifier implements Intensifier {
 						x_Edges.add(x2);
 						
 						//flip, scambio di x1 e x2 con y1 e y2* che chiude il tour
-						flip(current_solution, t1, t4);
+						flip(current_solution, t4, t1);
 						
 						//arco y2* che chiude il nuovo tour
 						Edge y2_star = createEdge(t4,t1);
@@ -176,7 +205,8 @@ public class LK_Intesifier implements Intensifier {
 							backtrack = false;
 						}
 						
-						//archi candidati ad essere y2, ordinati per lunghezza crescente
+						//archi candidati ad essere y2, ordinati per guadagno con x3
+						//descrescente
 						ArrayList<EdgeGain_Pair> y2s = getY2candidates(x2);
 						
 						int y2s_size;
@@ -210,26 +240,42 @@ public class LK_Intesifier implements Intensifier {
 							//paio y2-g2
 							EdgeGain_Pair pair2 = y2s.get(h);
 							
+							if(pair2.part_gain <= best_gain){
+								//l'arco y2 non migliora il guadagno totale trovato
+								if(!backtrack)
+									break;
+								continue;
+							}
+							
 							//arco y2
 							Edge y2 = pair2.edge;
 							
 							//guadagno g2
 							int g2 = pair2.gain;
 							
+							//guadagno parziale G2
+							int G2 = pair2.part_gain;
+							
 							//registra y2 e il guadagno G2
 							y_Edges.add(y2);
-							gains.add(g2 + g1);
+							gains.add(G2);
 							
 							//inizializzazione delle variabili del ciclo do-while
 							
 							//in realtà contiene yi-1, economia sulle variabili
 							Edge yi = y2;
 							
+							//guadagno gi
+							int gi = g2;
+							
+							//Guadagno parziale Gi
+							int Gi = G2;
+							
 							//città t2i-2
 							City t_2im2 = t4;
 							
 							//indice dell'iterazione
-							int i = 2;
+							int i = 3;
 							
 							do{							
 								//città t2i-1
@@ -245,13 +291,13 @@ public class LK_Intesifier implements Intensifier {
 								Edge yi_star = createEdge(t2i, t1);
 								
 								//flip: scambio xi e yi-1* con yi-1 e yi*
-								flip(current_solution, t_2im2,t_2im1);
+								flip(current_solution, t_2im1, t_2im2);
 								
 								//guadagno gi*
 								int gi_star = xi.getLength() - yi_star.getLength();
 								
 								//Guadagno Gi*
-								int Gi_star = gains.get(i-1) + gi_star;
+								int Gi_star = gains.get(i-2) + gi_star;
 								
 								//il nuovo tour è il migliore fino ad ora?
 								if(Gi_star>best_gain){
@@ -267,15 +313,22 @@ public class LK_Intesifier implements Intensifier {
 									backtrack = false;
 								}
 								
+								yi = null;
+								
 								// cerca il prossimo arco y
-								yi = getNextY(xi);
+								EdgeGain_Pair yi_pair = getNextY(xi, i);
 								
 								//è possibile valutare un altro scambio?
-								if(yi!=null){
+								if(yi_pair!=null){
+									
+									//nuovo arco yi
+									yi = yi_pair.edge;
 									
 									//guadagno gi
-									// TODO potrebbe essere stato calcolato già da
-									//		getNextY()
+									gi = yi_pair.gain;
+									
+									//guadagno parziale Gi
+									Gi = yi_pair.part_gain;
 									
 									// TODO registrazione di yi e gi
 									
@@ -284,7 +337,7 @@ public class LK_Intesifier implements Intensifier {
 								}
 								
 															
-							}while(yi!=null);
+							}while(yi!=null && Gi>best_gain);
 							
 							if(!backtrack)
 								break;
@@ -302,10 +355,10 @@ public class LK_Intesifier implements Intensifier {
 						City t4 = next(current_solution, t3);
 						
 						//arco x2
-						Edge x2 = createEdge(t4,t3);
+						Edge x2 = createEdge(t3,t4);
 						
 						//archi candidati a essere y2
-						ArrayList<EdgeGain_Pair> y2s = getY2candidates(x2);
+						ArrayList<EdgeGain_Pair> y2s = getY2candidates_infeasible(x2,t2);
 						
 						if(y2s==null){
 							//non ci sono candidati a essere y2: backtrack
@@ -319,11 +372,24 @@ public class LK_Intesifier implements Intensifier {
 							
 							EdgeGain_Pair y2_pair = y2s.get(h);
 							
+							if(y2_pair.part_gain<=best_gain){
+								//l'arco non porta alcuna miglioria
+								if(!backtrack)
+									break;
+								continue;
+							}
+							
 							//arco y2
 							Edge y2 = y2_pair.edge;
 							
 							//guadagno g2
 							int g2 = y2_pair.gain;
+							
+							//registra il guadagno G2
+							int G2 = g2+g1;
+							//TODO assicurarsi che il vettore dei guadagni sia riempito
+							//correttamente, ossia, durante il backtrack sia svuotato
+							gains.add(G2);
 							
 							//città t5
 							City t5 = y2.getDepart();
@@ -336,22 +402,139 @@ public class LK_Intesifier implements Intensifier {
 								//ritorna a un tour accettabile
 								
 								for(int l=0; l<2; l++){
+									//città t6, valutabile sia quale successore che
+									//predecessore di t5
+									City t6;
+									
 									if(l==0){
-										//t6 = next(t5)
-																				
-										//TODO:
+										//t6 = next(t5)										
+										t6 = next(current_solution, t5);
+						
 										// 3 scambi: flip(t1,t2,t3,t4)
 										//			 flip(t5,t6,t4,t2)
 										//			 flip(t3,t1,t2,t6)
+										
+										flip(current_solution,t3,t1);
+										flip(current_solution,t4,t5);
+										flip(current_solution,t2,t3);
 									}
 									else {
 										//t6 = prev(t5)
+										t6 = prev(current_solution, t5);
 										
-										//TODO:
 										// 2 scambi: flip(t1,t2,t6,t5)
 										//			 flip(t5,t2,t4,t3)
+										
+										flip(current_solution,t6,t1);
+										flip(current_solution,t4,t5);
 									}
+										
+									Edge x3 = createEdge(t5, t6);
+										
+									Edge y3_star = createEdge(t6, t1);
+										
+									//guadagno g3*
+									int g3_star = x3.getLength() - y3_star.getLength();
+										
+									//guadagno progessivo G3*
+									int G3_star = g3_star + g1 + g2;
+										
+									//il nuovo tour ha un guadagno globale migliore?
+									if(G3_star>best_gain){
+											
+										//il tour è più corto del migliore trovato
+										// TODO dovrebbe essere una copia
+										best_solution = current_solution;
+											
+										//aggiorna il guadagno migliore trovato
+										best_gain = G3_star;
+											
+										//non c'è bisogno di fare backtrack
+										backtrack = false;
+									}
+										
+									//loop per la ricerca di altri archi da scambiare
+										
+									int i = 3;
+										
+									Edge xi = x3;
+										
+									Edge yi_star = y3_star;
 									
+									//ricerca del prossimo arco yi
+									EdgeGain_Pair yi_pair = getNextY(xi, i);
+										
+									Edge yi = null;
+									
+									int gi;
+									
+									int Gi = 0;
+									
+									if(yi_pair!=null){
+										yi = yi_pair.edge;
+										gi = yi_pair.gain;
+										Gi = yi_pair.part_gain;
+									}
+										
+									//esistono aun arco per sostituire xi?
+									//porta un guadagno migliore?
+									while(yi!=null && Gi>best_gain){
+										//TODO registrare archi e guadagni
+											
+										i++;
+											
+										//città t2i-2
+										City t_2im2 = yi.getArrive();
+											
+										//città t2i-1
+										City t_2im1 = yi.getDepart();
+											
+										//città t2i
+										City t2i = next(current_solution, t_2im1);
+											
+										//arco xi
+										xi = createEdge(t_2im1, t2i);
+										
+										//flip per sostituire xi e yi-1* con yi e yi*
+										flip(current_solution, t_2im2, t_2im1);
+											
+										//arco yi*
+										yi_star = createEdge(t2i, t1);
+											
+										//guadagno gi*
+										int gi_star = xi.getLength() - 
+																yi_star.getLength();
+											
+										//Guadagno totale Gi*
+										int Gi_star = gains.get(i-2) + gi_star;
+											
+										//il nuovo tour ha un guadagno globale migliore?
+										if(Gi_star>best_gain){
+												
+											//il tour è più corto del migliore trovato
+											// TODO dovrebbe essere una copia
+											best_solution = current_solution;
+												
+											//aggiorna il guadagno migliore trovato
+											best_gain = Gi_star;
+												
+											//non c'è bisogno di fare backtrack
+											backtrack = false;
+										}
+											
+										yi = null;
+										
+										//ricerca del nuovo arco yi
+										yi_pair = getNextY(xi, i);
+										
+										if(yi_pair!=null){
+											yi = yi_pair.edge;
+											gi = yi_pair.gain;
+											Gi = yi_pair.part_gain;
+										}
+									}
+									//fine loop per la ricerca di possibili scambi
+										
 									if(!backtrack)
 										break;
 									
@@ -369,68 +552,200 @@ public class LK_Intesifier implements Intensifier {
 								//come precedente. Si prende in considerazione solo l'arco
 								//x4 più lungo tra i due che portano al possibile t8
 								
+								//correntemente la città t6 è precedente a t5 in quanto non
+								//sono ancora stati effettuati scambi
+								
 								//città t6
-								City t6 = next(current_solution,t5);
+								City t6 = prev(current_solution,t5);
 								
 								//arco x3
 								Edge x3 = createEdge(t5, t6);
 								
-								//TODO verificare se chiudendo il tour con y3* si ha un 
-								//	   tour migliore. se ciò accade bisogna creare il
-								//	   tour e poi disfarlo per continuare la ricerca
-								
 								//arco y3
-								Edge y3 = getY3candidates(x3);
+								Edge y3 = null;
 								
-								if(y3==null){
+								//guadagno g3
+								int g3;
+								
+								//guadagno totale G3
+								int G3 = 0;
+								
+								EdgeCity_pair y3_pair = getY3candidates(x3, t2, t3);
+								
+								if(y3_pair!=null){
+									y3 = y3_pair.edge_pair.edge;
+									g3 = y3_pair.edge_pair.gain;
+									G3 = y3_pair.edge_pair.part_gain;
+								}
+								
+								if(y3==null || G3 <= best_gain){
 									//non ci sono archi candidati a essere y3
+									if(!backtrack)
+										break;
 									continue;
 								}
 								
-								//registra l'arco x3
-								x_Edges.add(x3);
+								//TODO registra l'arco x3, y3 e il guadagno g3
 								
 								//città t7, sicuramente tra t2 e t3
 								City t7 = y3.getDepart();
 								
 								//gli scambi necessari per ricostruire il tour
-								//dipendono dalla città t8 scelta
+								//dipendono dalla città t8 scelta. 
 								
 								//2 possibili archi x4:
 								//		uno per t8 = next(t7)
 								//		uno per t8 = prev(t7)
 								
-								// città t8 successiva a t7
-								City t8_next = next(current_solution,t7);
-								Edge x4_next = createEdge(t7, t8_next);
-								
-								// città t8 precedente a t7
-								City t8_prev = prev(current_solution, t7);
-								Edge x4_prev = createEdge(t8_prev, t7);
+								//viene scelto l'arco x4 più lungo
 								
 								//flag per indicare quale dei due archi è stato scelto
-								boolean t8_is_next;
+								boolean t8_is_next = y3_pair.city_is_next;
 								
-								//x4_next è più lungo di x4_prev?
-								t8_is_next = x4_next.getLength() > x4_prev.getLength();
+								//città t8 scelta
+								City t8 = y3_pair.edge_city;
+								
+								//arco x4 scelto
+								Edge x4;
 								
 								if(t8_is_next){
 									// t8 è successivo a t7
 									
-									//TODO necessari 4 scambi:
+									x4 = createEdge(t7, t8);
+									
+									//necessari 4 scambi:
 									//			flip(t1,t2,t3,t4)
 									//			flip(t5,t6,t4,t2)
 									//			flip(t8,t7,t2,t6)
 									//			flip(t3,t1,t2,t8)
+									
+									flip(current_solution, t3, t1);
+									flip(current_solution, t4, t5);
+									flip(current_solution, t2, t8);
+									flip(current_solution, t2, t3);
+									
 								}
 								else {
 									// t8 è precendente a t7
 									
-									//TODO necessari 3 scambi
+									x4 = createEdge(t8, t7);
+									
+									//necessari 3 scambi
 									//			flip(t1,t2,t8,t7)
 									//			flip(t7,t2,t4,t3)
 									//			flip(t4,t7,t5,t6)
+									
+									flip(current_solution, t8, t1);
+									flip(current_solution, t4, t7);
+									flip(current_solution, t5, t4);
+									
 								}
+								
+								//arco y4*
+								Edge y4_star = createEdge(t8, t1);
+								
+								//guadagno g4*
+								int g4_star = x4.getLength() - y4_star.getLength();
+								
+								//guadagno totale G4*
+								int G4_star = g4_star + G3;
+								
+								//il nuovo tour ha un guadagno globale migliore?
+								if(G4_star>best_gain){
+										
+									//il tour è più corto del migliore trovato
+									// TODO dovrebbe essere una copia
+									best_solution = current_solution;
+										
+									//aggiorna il guadagno migliore trovato
+									best_gain = G4_star;
+										
+									//non c'è bisogno di fare backtrack
+									backtrack = false;
+								}
+								
+								//loop per la ricerca di altri archi da scambiare
+								
+								int i = 4;
+									
+								Edge xi = x4;
+									
+								Edge yi_star = y4_star;
+								
+								//ricerca del prossimo arco yi
+								EdgeGain_Pair yi_pair = getNextY(xi, i);
+									
+								Edge yi = null;
+								
+								int gi;
+								
+								int Gi = 0;
+								
+								if(yi_pair!=null){
+									yi = yi_pair.edge;
+									gi = yi_pair.gain;
+									Gi = yi_pair.part_gain;
+								}
+									
+								//esistono aun arco per sostituire xi?
+								//migliora il guadagno?
+								while(yi!=null && Gi>best_gain){
+									//TODO ottenere gi e registrarlo con gli archi
+										
+										
+									i++;
+										
+									//città t2i-2
+									City t_2im2 = yi.getArrive();
+										
+									//città t2i-1
+									City t_2im1 = yi.getDepart();
+										
+									//città t2i
+									City t2i = next(current_solution, t_2im1);
+										
+									//arco xi
+									xi = createEdge(t_2im1, t2i);
+									
+									//flip per sostituire xi e yi-1* con yi e yi*
+									flip(current_solution, t_2im2, t_2im1);
+									
+									//arco yi*
+									yi_star = createEdge(t2i, t1);
+										
+									//guadagno gi*
+									int gi_star = xi.getLength() - 
+															yi_star.getLength();
+										
+									//Guadagno totale Gi*
+									int Gi_star = gains.get(i-2) + gi_star;
+										
+									//il nuovo tour ha un guadagno globale migliore?
+									if(Gi_star>best_gain){
+											
+										//il tour è più corto del migliore trovato
+										// TODO dovrebbe essere una copia
+										best_solution = current_solution;
+											
+										//aggiorna il guadagno migliore trovato
+										best_gain = Gi_star;
+											
+										//non c'è bisogno di fare backtrack
+										backtrack = false;
+									}
+										
+									yi = null;
+									
+									//ricerca del nuovo arco yi
+									yi_pair = getNextY(xi, i);
+									
+									if(yi_pair!=null){
+										yi = yi_pair.edge;
+										gi = yi_pair.gain;
+										Gi = yi_pair.part_gain;
+									}
+								}
+								//fine loop per la ricerca di possibili scambi
 								
 							}
 							
@@ -467,10 +782,91 @@ public class LK_Intesifier implements Intensifier {
 	// ricerca dei candidati ad essere y1
 	private ArrayList<EdgeGain_Pair> getY1candidates( Edge x1 ){
 		
-		// si deve avere g1>0 perchè un arco sia candidabile
+		//città t2
+		City t2 = x1.getArrive();
 		
-		// TODO
-		return null;
+		//città successiva a t2
+		City t2_next = next(current_solution,t2);
+		
+		//Lista di città più vicine a t2
+		City[] list = city_manager.getNearest(t2);
+		
+		//indice degli archi candidati
+		int c = 0;
+		
+		//lista degli archi candidati
+		ArrayList<EdgeGain_Pair> candidates = new ArrayList<EdgeGain_Pair>();
+		
+		//numero massimo di archi y1 da valutare
+		int iterations = max_y1;
+		
+		if(iterations>list.length)
+			iterations = list.length;
+		
+		for(int i = 0; i < iterations; i++){
+			
+			//città t3
+			City t3 = list[i];
+			
+			if(t3 == t1_current || t3 == t2_next){
+				// l'arco (t3,t2) non può essere scelto
+				continue;
+			}
+			
+			//dato che non ci sono ancora stati scambi, l'arco x2 creato successivamente
+			//sarà rompibile
+			
+			//siccome potrebbero essere valutati due possibili x2, y1 è scelto solo in base
+			//al guadagno minimo che porta la prossima sostituzione
+			City t4_next = next(current_solution,t3);
+			City t4_prev = prev(current_solution,t3);
+			
+			Edge x2_next = createEdge(t3, t4_next);
+			
+			Edge x2_prev = createEdge(t4_prev, t3);
+			
+			//TODO valutare i risultati usando come criterio il guadagno massimo ottenibile
+			Edge x2 = x2_next.getLength() < x2_prev.getLength() ? x2_next : x2_prev;
+			
+			//potenziale arco y1
+			Edge y1 = createEdge(t3, t2);
+			
+			//guadagno g1
+			int g1 = x1.getLength() - y1.getLength();
+			
+			//l'arco porta un guadagno?
+			if(g1<=0){
+				//il guadagno iniziale è negativo
+				//a questo punto si può interrompere il loop, dato che tutte le altre città
+				//sono più lontane
+				break;
+			}
+			
+			
+			//misura di ottimalità dell'arco in base alla differenza con la lunghezza del
+			//prossimo arco da scambiare
+			int o1 = x2.getLength() - y1.getLength();
+			
+			//si sfrutta l'ordinamento sui guadagni, per cui in seguito si dovrà
+			//aggiustare le informazioni dell'oggetto EdgePair
+			candidates.add(new EdgeGain_Pair(y1, o1, g1));
+			c++;
+			
+		}
+		
+		//se non sono stati trovati candidati ritorna null
+		if(c==0)
+			return null;
+		
+		//ordinamento descrescente in base all'ottimalità dell'arco
+		Collections.sort(candidates, new EdgePairComparator());
+		
+		//riparazione degli oggetti EdgeGain_Pair nella lista
+		for(EdgeGain_Pair p : candidates){
+			p.gain = p.part_gain;
+		}
+		
+		return candidates;
 	}
 	
 //------------------------------------------------------------------------------------------
@@ -478,37 +874,434 @@ public class LK_Intesifier implements Intensifier {
 	// ricerca dei candidati ad essere y2
 	private ArrayList<EdgeGain_Pair> getY2candidates( Edge x2 ){
 		
-		// si deve avere g1+g2>0 perchè un arco sia candidabile
+		//città t4
+		City t4 = x2.getDepart();
 		
-		// TODO
-		return null;
+		//città precedente a t4
+		City t4_prev = prev(current_solution,t4);
+		
+		//Lista di città più vicine a t2
+		City[] list = city_manager.getNearest(t4);
+		
+		//Guadagno parziale G1
+		int G1 = gains.get(0);
+				
+		//indice degli archi candidati
+		int c = 0;
+				
+		//lista degli archi candidati
+		ArrayList<EdgeGain_Pair> candidates = new ArrayList<EdgeGain_Pair>();
+				
+		//numero massimo di archi y2 da valutare
+		int iterations = max_y2;
+				
+		if(iterations>list.length)
+			iterations = list.length;
+		
+		for(int i = 0; i < iterations; i++){
+			
+			//città t5
+			City t5 = list[i];
+			
+			if(t5==t1_current || t5 == t4_prev){
+				//l'arco (t5,t4) non può essere candidato
+				continue;
+			}
+			
+			//possibile arco y2
+			Edge y2 = createEdge(t5, t4);
+			
+			//città t6
+			City t6 = next(current_solution,t5);
+			
+			//arco x3 da rompere successivamente
+			Edge x3 = createEdge(t5, t6);
+			
+			//TODO aggiustare sistema di set di archi aggiunti e eliminati
+			
+			//FIXME questo controllo potrebbe dover essere modificato una volta stabilito
+			//		come verificare che un arco è tra quelli aggiunti
+			if(added_Edges.contains(x3)){
+				//y2 non può essere scelto in quanto provocherebbe la rottura di un arco
+				//aggiunto precedentemente
+				continue;
+			}
+			
+			//guadagno g2
+			int g2 = x2.getLength() - y2.getLength();
+			
+			//guadagno parziale G2
+			int G2 = G1 + g2;
+			
+			if(G2<=0){
+				//l'arco rende il guadagno parziale minore o uguale a 0, quindi non è tra 
+				//i candidati. Inoltre è inutile continuare la ricerca dato che G2 è 
+				//decrescente scorrendo la lista
+				break;
+			}
+			
+			//l'ottimalità degli archi è valutata in base al guadagno rispetto all'arco x3
+			//ottimalità o2
+			int o2 = x3.getLength() - y2.getLength();
+			
+			//sfrutta temporaneamente l'ordinamento rispetto all'attributo gain per
+			//ordinare rispetto a o2, bisogna poi ricalcolare G2 e salvare i dati 
+			//correttamente in ogni EdgeGain_Pair nella lista
+			candidates.add(new EdgeGain_Pair(y2, o2, g2));
+			c++;
+			
+		}
+		
+		//sono stati trovati candidati?
+		if(c==0)
+			return null;
+		
+		//ordinamento rispetto all'ottimalità
+		Collections.sort(candidates, new EdgePairComparator());
+		
+		//ciclo per ricalcolare G2 e risistemare i dati per io pair
+		for(EdgeGain_Pair p : candidates){
+			
+			int G2 = p.part_gain + G1;
+			p.gain = p.part_gain;
+			p.part_gain = G2;
+			
+		}
+		
+		return candidates;
 	}
 	
 //------------------------------------------------------------------------------------------
 	
-		// ricerca di un candidato ad essere y3
-		private Edge getY3candidates( Edge x3 ){
+	// ricerca dei candidati ad essere y2 nel caso in cui la scelta di x2 rende il tour
+	//non hamiltoniano
+	//Quando il metodo è chiamato non è stato ancora eseguito alcuno scambio
+	private ArrayList<EdgeGain_Pair> getY2candidates_infeasible( Edge x2, City t2 ){
 			
-			//TODO dovrebbe calcolare anche il guadagno
+		//città t4
+		City t4 = x2.getArrive();
+		
+		//città t3
+		City t3 = x2.getDepart();
+		
+		//città t1
+		City t1 = t1_current;
+		
+		//città successiva a t4
+		City t4_next = next(current_solution, t4);
+		
+		//lista di città vicine a t4
+		City[] list = city_manager.getNearest(t4);
+		
+		//Guadagno parziale G1
+		int G1 = gains.get(0);
+				
+		//indice degli archi candidati
+		int c = 0;
+				
+		//lista degli archi candidati
+		ArrayList<EdgeGain_Pair> candidates = new ArrayList<EdgeGain_Pair>();
+				
+		//numero massimo di archi y2 da valutare
+		int iterations = max_y2;
+				
+		if(iterations>list.length)
+			iterations = list.length;
+		
+		for(int i = 0; i < iterations; i++){
 			
-			//TODO la città t7 deve per forza trovarsi tra t2 e t3
+			//città t5
+			City t5 = list[i];
 			
-			// TODO 
+			//potenziale arco y2
+			Edge y2 = createEdge(t5, t4);
+			
+			//guadagno g2
+			int g2 = x2.getLength() - y2.getLength();
+			
+			//guadagno parziale G2
+			int G2 = G1 + g2;
+			
+			//l'arco porta un guadagno?
+			if(G2<=0){
+				//l'arco non porta alcun guadagno, e così anche quelli successivi
+				break;
+			}
+			
+			//arco x3
+			Edge x3;
+			
+			//il criterio per cui il prossimo x3 può essere rotto è valutato controllando che
+			//t5 non sia una delle prime 4 città o la successiva di t4
+			if(between(current_solution, t2, t5, t3)){
+				//t5 è tra t2 e t3
+				
+				//si possono avere due archi x3, quindi l'ottimalità è valutata rispetto a
+				//quello più corto TODO valutare i risultati usando il più lungo
+				
+				City t6_next = next(current_solution, t5);
+				City t6_prev = prev(current_solution, t5);
+				
+				Edge x3_next = createEdge(t5, t6_next);
+				Edge x3_prev = createEdge(t6_prev, t5);
+				
+				x3 = x3_next.getLength() < x3_prev.getLength() ? x3_next : x3_prev;
+				
+			}
+			else if(between(current_solution, t4, t5, t1)){
+				//t5 è tra t4 e t1
+				if(t5 == t4_next){
+					//l'arco (t5,t4) non può essere candidato
+					continue;
+				}
+				
+				//la città t6 è quella attualmente precedente a t5
+				City t6 = prev(current_solution,t5);
+				
+				x3 = createEdge(t5, t6);
+			}
+			else{
+				//t5 è una delle prime 4 città
+				continue;
+			}
+			
+			//ottimalità o2
+			int o2 = x3.getLength() - y2.getLength();
+			
+			//sfrutta temporaneamente l'ordinamento rispetto all'attributo gain per
+			//ordinare rispetto a o2, bisogna poi ricalcolare G2 e salvare i dati 
+			//correttamente in ogni EdgeGain_Pair nella lista
+			candidates.add(new EdgeGain_Pair(y2, o2, g2));
+			c++;
+			
+		}
+			
+			
+		//sono stati trovati candidati?
+		if(c==0)
+			return null;
+		
+		//ordinamento rispetto all'ottimalità
+		Collections.sort(candidates, new EdgePairComparator());
+		
+		//ciclo per ricalcolare G2 e risistemare i dati per io pair
+		for(EdgeGain_Pair p : candidates){
+			
+			int G2 = p.part_gain + G1;
+			p.gain = p.part_gain;
+			p.part_gain = G2;
+			
+		}
+		
+		return candidates;
+	}
+
+	
+//------------------------------------------------------------------------------------------
+	
+	// ricerca di un candidato ad essere y3
+	//quando il metodo viene richiamato non è stato effettuato alcuno scambio
+	private EdgeCity_pair getY3candidates( Edge x3, City t2, City t3 ){
+		
+		//città t6
+		City t6 = x3.getArrive();
+		
+		//lista delle città più vicine a t6
+		City[] list = city_manager.getNearest(t6);
+		
+		//contatore degli archi candidati
+		int c = 0;
+			
+		//Guadagno parziale G1
+		int G2 = gains.get(1);
+		
+		//arco scelto
+		EdgeGain_Pair y3_pair = new EdgeGain_Pair(null, 0, 0);
+		
+		//città t8 scelta
+		City city_edge = null;
+		
+		//scelta dell'arco x4
+		boolean city_is_next = true;
+		
+		//miglior indice di ottimalità trovato
+		int opt = 0;
+				
+		//numero massimo di archi y3 da valutare
+		int iterations = max_yi;
+				
+		if(iterations>list.length)
+			iterations = list.length;
+		
+		for(int i = 0; i<iterations; i++){
+			
+			//città t7
+			City t7 = list[i];
+			
+			//potenziale arco y3
+			Edge y3 = createEdge(t7, t6);
+			
+			//guadagno g3
+			int g3 = x3.getLength() - y3.getLength();
+			
+			//guadagno parziale G3
+			int G3 = g3 + G2;
+			
+			//lo scambio tra x3 e y3 porta ancora a un guadagno?
+			if(G3<=0){
+				//non c'è guadagno nello scambio, è inutile continuare a cercare un arco
+				break;
+			}
+			
+			//la condizione per cui t7 sia tra t2 e t3 permette di assicurare che il prossimo
+			//arco x4 sia rompibile
+			
+			//t7 è tra t2 e t3?
+			if(!between(current_solution, t2, t7, t3)){
+				//t7 non si trova tra t2 e t3, quindi l'arco (t6,t7) non può essere y3
+				continue;
+			}
+			
+			//due possibili archi x4, si sceglie quello più lungo, sul quale si calcola
+			//l'ottimalità dell'arco y3
+			
+			City t8_next = next(current_solution, t7);
+			City t8_prev = prev(current_solution, t7);
+			
+			Edge x4_next = createEdge(t7, t8_next);
+			
+			Edge x4_prev = createEdge(t8_prev, t7);
+			
+			boolean t8_is_next = x4_next.getLength() > x4_prev.getLength();
+			
+			Edge x4 = t8_is_next ? x4_next : x4_prev;
+			
+			City t8 = t8_is_next ? t8_next : t8_prev;
+			
+			//ottimalità o3
+			int o3 = x4.getLength() - y3.getLength();
+			
+			//l'arco è quello più ottimale tra quelli già valutati?
+			if(o3 > opt){
+				//l'arco è temporaneamente il miglior candidato
+				y3_pair.edge = y3;
+				y3_pair.gain = g3;
+				y3_pair.part_gain = G3;
+				
+				city_edge = t8;
+				
+				city_is_next = t8_is_next;
+				
+				c++;
+				opt = o3;
+			}
+			
+		}
+		
+		//sono stati trovati candidati?
+		if(c==0){
+			//nessun candidato per y3
 			return null;
 		}
+			
+		EdgeCity_pair y3_city_pair = new EdgeCity_pair(y3_pair, city_edge, city_is_next);
+		
+		return y3_city_pair;
+	}
 	
 //------------------------------------------------------------------------------------------	
 	
 	//ricerca del prossimo arco y che soddisfa le condizioni per poter valutare uno scambio
 	//e controllo del stop criterion
-	private Edge getNextY(Edge xi){
+	private EdgeGain_Pair getNextY(Edge xi, int i){
 		
-		// TODO dovrebbe calcolare anche il guadagno del prossimo arco y
+		//città t2i
+		City t2i = xi.getArrive();
 		
-		//TODO la città precedente nel tour rispetto a quella da cui valutiamo y2 dovrebbe
-		//	   essere scartata dal calcolo in quanto genera un loop
+		//città t2i-1
+		City t_2im1 = xi.getDepart();
 		
-		return null;
+		//lista delle città più vicine a t2i
+		City[] list = city_manager.getNearest(t2i);
+		
+		//contatore degli archi candidati
+		int c = 0;
+			
+		//Guadagno parziale Gi-1
+		int G_im1 = gains.get(i-2);
+		
+		//arco scelto
+		EdgeGain_Pair yi_pair = new EdgeGain_Pair(null, 0, 0);
+		
+		//miglior indice di ottimalità trovato
+		int opt = 0;
+				
+		//numero massimo di archi yi da valutare
+		int iterations = max_yi;
+				
+		if(iterations>list.length)
+			iterations = list.length;
+		
+		for(int k = 0; k < iterations; k++){
+			
+			//città t2i+1
+			City t_2ip1 = list[k];
+			
+			if(t_2ip1 == t1_current || t_2ip1 == t_2im1){
+				//l'arco (t2i,t2i+1) non può essere candidato
+				continue;
+			}
+			
+			//potenziale arco yi
+			Edge yi = createEdge(t_2ip1, t2i);
+			
+			//guadagno gi
+			int gi = xi.getLength() - yi.getLength();
+			
+			//guadagno parziale Gi
+			int Gi = G_im1 + gi;
+			
+			//lo scambio porta a un guadagno?
+			if(Gi <= 0){
+				//lo scambio non porta alcun guadagno, si può interrompere la ricerca
+				break;
+			}
+			
+			//città t2i+2
+			City t_2ip2 = next(current_solution, t_2ip1);
+			
+			//arco xi+1
+			Edge x_ip1 = createEdge(t_2ip1, t_2ip2);
+			
+			//è possibile rompere il prossimo arco xi+1?
+			if(added_Edges.contains(x_ip1)){
+				//yi non può essere candidato dato che porterebbe a rompere un arco y
+				continue;
+			}
+			
+			//ottimalità oi
+			int oi = x_ip1.getLength() - yi.getLength();
+			
+			//l'arco è quello più ottimale tra quelli già valutati?
+			if(oi > opt){
+				//l'arco è temporaneamente il miglior candidato
+				yi_pair.edge = yi;
+				yi_pair.gain = gi;
+				yi_pair.part_gain = Gi;
+				
+				c++;
+				opt = oi;
+			}
+			
+		}
+		
+		//sono stati trovati candidati?
+		if(c==0){
+			//nessun candidato per yi
+			return null;
+		}
+		
+		return yi_pair;
 	}
 	
 //------------------------------------------------------------------------------------------
@@ -574,18 +1367,42 @@ public class LK_Intesifier implements Intensifier {
 		Edge edge;
 		int gain;
 		
-		EdgeGain_Pair(Edge e, int g){
+		int part_gain;
+		
+		EdgeGain_Pair(Edge e, int g, int p){
 			edge = e;
 			gain = g;
+			part_gain = p;
 		}
 		
-		Edge getEdge(){
-			return edge;
+	}
+	
+	//classe per l'ordinamento di un EdgeGain_Pair in base al guadagno gi di un arco y
+	private class EdgePairComparator implements Comparator<EdgeGain_Pair> {
+
+		
+		public int compare(EdgeGain_Pair e0, EdgeGain_Pair e1) {
+			
+			//ordinamento decrescente
+			return Integer.compare(e1.gain, e0.gain);
 		}
 		
-		int getGain(){
-			return gain;
+	}
+	
+	//classe utilizzata per memorizzare quale città t8 viene scelta nel caso di scambio
+	//di 4 archi per rendere il tour hamiltoniano
+	private class EdgeCity_pair {
+		
+		EdgeGain_Pair edge_pair;
+		City edge_city;
+		boolean city_is_next;
+		
+		EdgeCity_pair(EdgeGain_Pair e, City c, boolean b){
+			edge_pair = e;
+			edge_city = c;
+			city_is_next =b;
 		}
 	}
+	
 
 }
