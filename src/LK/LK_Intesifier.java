@@ -41,13 +41,13 @@ public class LK_Intesifier implements Intensifier {
 	private HashSet<Edge> added_Edges;
 	
 	//insieme degli archi x
-	private ArrayList<Edge> x_Edges;
+	private Edge[] x_Edges;
 	
 	//insieme degli archi y
-	private ArrayList<Edge> y_Edges;
+	private Edge[] y_Edges;
 	
 	//array dei guadagni progressivi
-	private ArrayList<Integer> gains;
+	private int[] gains;
 	
 	//flag della direzione
 	// true:  scorrimento dal primo elemento della soluzione all'ultimo      
@@ -71,6 +71,14 @@ public class LK_Intesifier implements Intensifier {
 	private int max_yi = 5;
 	
 //------------------------------------------------------------------------------------------
+// Costruttore
+//------------------------------------------------------------------------------------------
+	
+	public LK_Intesifier(CityManager city_manager){
+		this.city_manager = city_manager;
+	}
+	
+//------------------------------------------------------------------------------------------
 // Metodi di ricerca
 //------------------------------------------------------------------------------------------
 
@@ -80,6 +88,8 @@ public class LK_Intesifier implements Intensifier {
 		//la soluzione da migliorare è quella iniziale e la migliore fino ad ora
 		best_solution = start; // TODO dovrebbe essere una
 							   // copia
+		
+		int n = city_manager.n;
 		
 		//ricerca iterando sulle città da prendere come città iniziale del tour
 		for(int i = 0; i < cities.length; i++){
@@ -101,9 +111,10 @@ public class LK_Intesifier implements Intensifier {
 			added_Edges = new HashSet<Edge>();
 			
 			//gli insiemi degli archi x e y, e il vettore di guadagni sono vuoti
-			x_Edges = new ArrayList<Edge>();
-			y_Edges = new ArrayList<Edge>();
-			gains = new ArrayList<Integer>();
+			x_Edges = new Edge[n];
+			y_Edges = new Edge[n];
+			
+			gains = new int[n];
 			
 			//nuova città iniziale
 			t1_current = cities[i];
@@ -134,7 +145,7 @@ public class LK_Intesifier implements Intensifier {
 			
 			//arco x1
 			Edge x1 = createEdge(t1,t2);
-			x_Edges.add(x1);
+			x_Edges[0] = x1;
 			
 			//archi candidati ad essere y1, ordinati per lunghezza crescente
 			ArrayList<EdgeGain_Pair> y1s = getY1candidates(x1);
@@ -143,7 +154,7 @@ public class LK_Intesifier implements Intensifier {
 			if(y1s == null){
 				//backtracking: elimina x1 dal gruppo di archi x
 				//TODO valutare di aggiungere x1 solo dopo questo controllo
-				x_Edges.remove(0);
+				//FIXME x_Edges.remove(0);
 				continue;
 			}
 			
@@ -160,8 +171,11 @@ public class LK_Intesifier implements Intensifier {
 				int g1 = pair1.gain;
 				
 				//registra y1 e G1
-				y_Edges.add(y1);
-				gains.add(g1);
+				y_Edges[0] = y1;
+				
+				added_Edges.add(y1);
+				
+				gains[0] = g1;
 				
 				//città t3
 				City t3 = y1.getDepart();
@@ -177,7 +191,7 @@ public class LK_Intesifier implements Intensifier {
 						
 						//arco x2
 						Edge x2 = createEdge(t4,t3);
-						x_Edges.add(x2);
+						x_Edges[1] = x2;
 						
 						//flip, scambio di x1 e x2 con y1 e y2* che chiude il tour
 						flip(current_solution, t4, t1);
@@ -222,7 +236,7 @@ public class LK_Intesifier implements Intensifier {
 																  //      una copia
 							
 								//TODO valutare di aggiungere x2 solo dopo questo controllo
-								x_Edges.remove(1);
+								//FIXME x_Edges.remove(1);
 								continue;
 							}
 							else{
@@ -257,8 +271,10 @@ public class LK_Intesifier implements Intensifier {
 							int G2 = pair2.part_gain;
 							
 							//registra y2 e il guadagno G2
-							y_Edges.add(y2);
-							gains.add(G2);
+							y_Edges[1] = y2;
+							added_Edges.add(y2);
+							
+							gains[1] = G2;
 							
 							//inizializzazione delle variabili del ciclo do-while
 							
@@ -286,6 +302,9 @@ public class LK_Intesifier implements Intensifier {
 							
 								//arco xi
 								Edge xi = createEdge(t_2im1,t2i);
+								
+								//registra xi
+								x_Edges[i-1] = xi;
 							
 								//arco yi*
 								Edge yi_star = createEdge(t2i, t1);
@@ -297,7 +316,7 @@ public class LK_Intesifier implements Intensifier {
 								int gi_star = xi.getLength() - yi_star.getLength();
 								
 								//Guadagno Gi*
-								int Gi_star = gains.get(i-2) + gi_star;
+								int Gi_star = gains[i-2] + gi_star;
 								
 								//il nuovo tour è il migliore fino ad ora?
 								if(Gi_star>best_gain){
@@ -331,6 +350,10 @@ public class LK_Intesifier implements Intensifier {
 									Gi = yi_pair.part_gain;
 									
 									// TODO registrazione di yi e gi
+									y_Edges[i-1] = yi;
+									added_Edges.add(yi);
+									
+									gains[i-1] = Gi;
 									
 									t_2im2 = t2i;
 									i++;
@@ -342,13 +365,22 @@ public class LK_Intesifier implements Intensifier {
 							if(!backtrack)
 								break;
 							
+							//TODO backtrack per riportare il sistema alla soluzione iniziale
+							//	   dovrebbe bastare copiare la soluzione iniziale a quella
+							//	   corrente e svuotare la lista di archi aggiunti
+							
+							current_solution = best_solution; //TODO dovrebbe essere una copia
+
+							//TODO valutare l'uso di clear()
+							added_Edges = new HashSet<Edge>();
+							added_Edges.add(y1);
 						}
 						//fine loop su y2
 						
 					}
 					else {
-						//risultato non accettabile:
-						//la scelta di x2 porta a due cicli bisogna ritornare a un tour
+						//risultato non accettabile.
+						//la scelta di x2 porta a due cicli: bisogna ritornare a un tour
 						//hamiltoniano
 						
 						//città t4
@@ -365,7 +397,7 @@ public class LK_Intesifier implements Intensifier {
 							continue;
 						}
 						
-						x_Edges.add(x2);
+						x_Edges[1] = x2;
 						
 						//ottimizzazione per y2 di lunghezza crescente
 						for(int h=0; h<y2s.size(); h++){
@@ -387,9 +419,12 @@ public class LK_Intesifier implements Intensifier {
 							
 							//registra il guadagno G2
 							int G2 = g2+g1;
-							//TODO assicurarsi che il vettore dei guadagni sia riempito
-							//correttamente, ossia, durante il backtrack sia svuotato
-							gains.add(G2);
+							
+							//registrazione di y2 e G2
+							y_Edges[1] = y2;
+							added_Edges.add(y2);
+							
+							gains[1] = G2;
 							
 							//città t5
 							City t5 = y2.getDepart();
@@ -429,6 +464,8 @@ public class LK_Intesifier implements Intensifier {
 									}
 										
 									Edge x3 = createEdge(t5, t6);
+									
+									x_Edges[2] = x3;
 										
 									Edge y3_star = createEdge(t6, t1);
 										
@@ -473,12 +510,16 @@ public class LK_Intesifier implements Intensifier {
 										yi = yi_pair.edge;
 										gi = yi_pair.gain;
 										Gi = yi_pair.part_gain;
+										
+										y_Edges[i-1] = yi;
+										added_Edges.add(yi);
+										
+										gains[i-1] = Gi;
 									}
 										
 									//esistono aun arco per sostituire xi?
 									//porta un guadagno migliore?
 									while(yi!=null && Gi>best_gain){
-										//TODO registrare archi e guadagni
 											
 										i++;
 											
@@ -501,11 +542,10 @@ public class LK_Intesifier implements Intensifier {
 										yi_star = createEdge(t2i, t1);
 											
 										//guadagno gi*
-										int gi_star = xi.getLength() - 
-																yi_star.getLength();
+										int gi_star = xi.getLength() - yi_star.getLength();
 											
 										//Guadagno totale Gi*
-										int Gi_star = gains.get(i-2) + gi_star;
+										int Gi_star = gains[i-2] + gi_star;
 											
 										//il nuovo tour ha un guadagno globale migliore?
 										if(Gi_star>best_gain){
@@ -530,6 +570,11 @@ public class LK_Intesifier implements Intensifier {
 											yi = yi_pair.edge;
 											gi = yi_pair.gain;
 											Gi = yi_pair.part_gain;
+											
+											y_Edges[i-1] = yi;
+											added_Edges.add(yi);
+											
+											gains[i-1] = Gi;
 										}
 									}
 									//fine loop per la ricerca di possibili scambi
@@ -537,9 +582,16 @@ public class LK_Intesifier implements Intensifier {
 									if(!backtrack)
 										break;
 									
+									current_solution = best_solution; //TODO copia
+									
+									//TODO valutare l'uso di clear()
+									added_Edges = new HashSet<Edge>();
+									added_Edges.add(y1);
+									added_Edges.add(y2);
+									
+									
 								}
 								// fine loop per i due casi di t6
-								
 								
 							}
 							else {
@@ -560,6 +612,9 @@ public class LK_Intesifier implements Intensifier {
 								//arco x3
 								Edge x3 = createEdge(t5, t6);
 								
+								//registra x3
+								x_Edges[2] = x3;
+								
 								//arco y3
 								Edge y3 = null;
 								
@@ -575,6 +630,12 @@ public class LK_Intesifier implements Intensifier {
 									y3 = y3_pair.edge_pair.edge;
 									g3 = y3_pair.edge_pair.gain;
 									G3 = y3_pair.edge_pair.part_gain;
+									
+									//registra y3 e G3
+									y_Edges[2] = y3;
+									added_Edges.add(y3);
+									
+									gains[2] = G3;
 								}
 								
 								if(y3==null || G3 <= best_gain){
@@ -583,8 +644,6 @@ public class LK_Intesifier implements Intensifier {
 										break;
 									continue;
 								}
-								
-								//TODO registra l'arco x3, y3 e il guadagno g3
 								
 								//città t7, sicuramente tra t2 e t3
 								City t7 = y3.getDepart();
@@ -640,6 +699,9 @@ public class LK_Intesifier implements Intensifier {
 									
 								}
 								
+								//registra x3
+								x_Edges[3] = x4;
+								
 								//arco y4*
 								Edge y4_star = createEdge(t8, t1);
 								
@@ -684,6 +746,12 @@ public class LK_Intesifier implements Intensifier {
 									yi = yi_pair.edge;
 									gi = yi_pair.gain;
 									Gi = yi_pair.part_gain;
+									
+									//registra yi e Gi
+									y_Edges[i-1] = yi;
+									added_Edges.add(yi);
+									
+									gains[i-1] = Gi;
 								}
 									
 								//esistono aun arco per sostituire xi?
@@ -706,6 +774,9 @@ public class LK_Intesifier implements Intensifier {
 									//arco xi
 									xi = createEdge(t_2im1, t2i);
 									
+									//registra xi
+									x_Edges[i-1] = xi;
+									
 									//flip per sostituire xi e yi-1* con yi e yi*
 									flip(current_solution, t_2im2, t_2im1);
 									
@@ -717,7 +788,7 @@ public class LK_Intesifier implements Intensifier {
 															yi_star.getLength();
 										
 									//Guadagno totale Gi*
-									int Gi_star = gains.get(i-2) + gi_star;
+									int Gi_star = gains[i-2] + gi_star;
 										
 									//il nuovo tour ha un guadagno globale migliore?
 									if(Gi_star>best_gain){
@@ -742,6 +813,12 @@ public class LK_Intesifier implements Intensifier {
 										yi = yi_pair.edge;
 										gi = yi_pair.gain;
 										Gi = yi_pair.part_gain;
+										
+										//registra yi e Gi
+										y_Edges[i-1] = yi;
+										added_Edges.add(yi);
+										
+										gains[i-1] = Gi;
 									}
 								}
 								//fine loop per la ricerca di possibili scambi
@@ -750,6 +827,12 @@ public class LK_Intesifier implements Intensifier {
 							
 							if(!backtrack)
 								break;
+							
+							current_solution = best_solution; //TODO copia
+							
+							//TODO valutare l'uso di clear()
+							added_Edges = new HashSet<Edge>();
+							added_Edges.add(y1);
 							
 						}
 						//fine loop su y2
@@ -760,16 +843,25 @@ public class LK_Intesifier implements Intensifier {
 					if(!backtrack)
 						break;
 					
+					current_solution = best_solution; //TODO copia
+					
 				}
 				//fine loop su x2
 				
 				if(!backtrack)
 					break;
+				
+				current_solution = best_solution; //TODO copia
+				
 			}
 			//fine loop su y1
 			
 			if(!backtrack)
 				break;
+			
+			current_solution = best_solution; //TODO copia
+			
+			added_Edges.clear();
 			
 		}
 		//fine loop su x1
@@ -883,7 +975,7 @@ public class LK_Intesifier implements Intensifier {
 		City[] list = city_manager.getNearest(t4);
 		
 		//Guadagno parziale G1
-		int G1 = gains.get(0);
+		int G1 = gains[0];
 				
 		//indice degli archi candidati
 		int c = 0;
@@ -993,7 +1085,7 @@ public class LK_Intesifier implements Intensifier {
 		City[] list = city_manager.getNearest(t4);
 		
 		//Guadagno parziale G1
-		int G1 = gains.get(0);
+		int G1 = gains[0];
 				
 		//indice degli archi candidati
 		int c = 0;
@@ -1030,8 +1122,8 @@ public class LK_Intesifier implements Intensifier {
 			//arco x3
 			Edge x3;
 			
-			//il criterio per cui il prossimo x3 può essere rotto è valutato controllando che
-			//t5 non sia una delle prime 4 città o la successiva di t4
+			//il criterio per cui il prossimo x3 può essere rotto è valutato controllando 
+			//che t5 non sia una delle prime 4 città o la successiva di t4
 			if(between(current_solution, t2, t5, t3)){
 				//t5 è tra t2 e t3
 				
@@ -1111,8 +1203,8 @@ public class LK_Intesifier implements Intensifier {
 		//contatore degli archi candidati
 		int c = 0;
 			
-		//Guadagno parziale G1
-		int G2 = gains.get(1);
+		//Guadagno parziale G2
+		int G2 = gains[1];
 		
 		//arco scelto
 		EdgeGain_Pair y3_pair = new EdgeGain_Pair(null, 0, 0);
@@ -1152,8 +1244,8 @@ public class LK_Intesifier implements Intensifier {
 				break;
 			}
 			
-			//la condizione per cui t7 sia tra t2 e t3 permette di assicurare che il prossimo
-			//arco x4 sia rompibile
+			//la condizione per cui t7 sia tra t2 e t3 permette di assicurare che il 
+			//prossimo arco x4 sia rompibile
 			
 			//t7 è tra t2 e t3?
 			if(!between(current_solution, t2, t7, t3)){
@@ -1227,7 +1319,7 @@ public class LK_Intesifier implements Intensifier {
 		int c = 0;
 			
 		//Guadagno parziale Gi-1
-		int G_im1 = gains.get(i-2);
+		int G_im1 = gains[i-2];
 		
 		//arco scelto
 		EdgeGain_Pair yi_pair = new EdgeGain_Pair(null, 0, 0);

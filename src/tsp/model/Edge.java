@@ -37,4 +37,19 @@ public class Edge {
 		return false;
 		
 	}
+	
+	public int hashCode(){
+		
+		City c1 = depart, c2 = arrive;
+		
+		if(arrive.city<depart.city){
+			c1 = arrive;
+			c2 = depart;
+		}
+		
+		return c1.city * 131 + c2.city * 13;
+	}
+	
+	
+	
 }
