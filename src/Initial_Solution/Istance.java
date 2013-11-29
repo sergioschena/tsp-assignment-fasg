@@ -2,32 +2,49 @@ package Initial_Solution;
 
 import java.io.*;
 import java.util.*;
+
 import tsp.model.*;
 
-//Istance contains the name, the number of nodes, the list of the nodes (numbered and with their coordinates)
+//Istance contains the name, the number of nodes, the list of the nodes (numbered with their coordinates)
 public class Istance {
 	
-	String name;
-	int N; 
-	LinkedList<City> cities = new LinkedList<City>();
+	public String fileName;
+	public int N; //number of nodes
+	public LinkedList<City> cities_ll = new LinkedList<City>();
+	public City[] cities_arr; //?
 	
-	public Istance(String name, int n){ 
-		this.name=name;
-		this.N=n; //TODO: lettura dal file - name si puo togliere?
+	
+	public Istance(String fileName) throws IOException{ 
+		
+		this.fileName = fileName;
+		FileReader f;
+	    f=new FileReader(fileName);
+		BufferedReader b;
+		b=new BufferedReader(f);
+		String s = null;
+		//TODO lettura del nome istanza - serve?
+		for(int i=0; i<4; i++){
+			s=b.readLine();
+		}//gets the row with N number of cities
+		StringTokenizer st = new StringTokenizer(s, ":"); //TODO controllare spazio dopo ":"
+		st.nextToken();
+    	int n = Integer.parseInt(st.toString());
+    	this.N=n;
+    	b.close();
 	}
 	
-	public String getName(){
-		return name;
+	public String getFileName(){
+		return fileName;
 	}
 	
 	public int getN(){
 		return N;
 	}
 	
-	public LinkedList<City> InstanceGenerator(String fileName) throws IOException{ //TODO: riceve il file name?
+	public City[] InstanceGenerator() throws IOException{ //TODO: riceve il file name?
 		
 		FileReader f;
-	    f=new FileReader(fileName);
+	    f=new FileReader(this.fileName);
 		BufferedReader b;
 	    b=new BufferedReader(f);
 	    String s = null;
@@ -48,11 +65,13 @@ public class Istance {
 	    	y = Integer.parseInt(st.toString());
 	    	
 	    	City c = new City(a, x, y);
-	    	cities.add(c);
+	    	cities_ll.add(c);
 	    	
 	    }
 	    
-	    return cities;
+	    b.close();
+	    cities_arr = (City[]) cities_ll.toArray();
+	    return cities_arr;
 			
 	}
 

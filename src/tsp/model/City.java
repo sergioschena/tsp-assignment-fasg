@@ -4,6 +4,8 @@ public class City {
 	double x;
 	double y;
 	int city;
+	public boolean visited;
+	
 	
 	public City(int n, double x, double y){
 		this.x = x;
@@ -47,4 +49,11 @@ public class City {
 		City oth = (City) o;
 		return oth.city == this.city;
 	}
+
+	public void visit(boolean b) {
+		this.visited=b;
+		return;
+		
+	}
+	
 }
