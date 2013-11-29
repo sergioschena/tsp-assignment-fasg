@@ -36,6 +36,9 @@ public class LK_Intesifier implements Intensifier {
 	// gestore delle città
 	private CityManager city_manager;
 	
+	// numero di città
+	int city_number;
+	
 	
 	// set degli archi aggiunti
 	private HashSet<Edge> added_Edges;
@@ -58,6 +61,10 @@ public class LK_Intesifier implements Intensifier {
 // Parametri
 //------------------------------------------------------------------------------------------
 	
+	//numero di città iniziali da valutare al massimo
+	//dovrebbe essere circa 8
+	private int max_t1 = 8;
+	
 	//numero di archi y1 da valutare al massimo
 	// dovrebbe essere uguale a 5 o 6
 	private int max_y1 = 5;
@@ -70,12 +77,28 @@ public class LK_Intesifier implements Intensifier {
 	// dovrebbe essere uguale a 5 o 6
 	private int max_yi = 5;
 	
+	//numero massimo di archi scambiabili a ogni iterazione
+	//dovrebbe essere uguale a 50
+	private int max_lambda = 50;
+	
 //------------------------------------------------------------------------------------------
-// Costruttore
+// Costruttore e setter
 //------------------------------------------------------------------------------------------
 	
 	public LK_Intesifier(CityManager city_manager){
 		this.city_manager = city_manager;
+		this.city_number = city_manager.n;
+		this.cities = city_manager.getCities();
+	}
+	
+	public void setParam(int max_t1, int max_y1, int max_y2, int max_yi, int max_lambda){
+		
+		this.max_t1 = max_t1;
+		this.max_y1 = max_y1;
+		this.max_y2 = max_y2;
+		this.max_yi = max_yi;
+		this.max_lambda = max_lambda;
+		
 	}
 	
 //------------------------------------------------------------------------------------------
@@ -86,20 +109,18 @@ public class LK_Intesifier implements Intensifier {
 	public Solution improve(Solution start) {
 		
 		//la soluzione da migliorare è quella iniziale e la migliore fino ad ora
-		best_solution = start; // TODO dovrebbe essere una
-							   // copia
+		best_solution = (Solution)start.clone();
 		
-		int n = city_manager.n;
+		int n = city_number<max_t1 ? city_number : max_t1;
 		
 		//ricerca iterando sulle città da prendere come città iniziale del tour
-		for(int i = 0; i < cities.length; i++){
+		for(int i = 0; i < n; i++){
 			
 			// TODO le inizializzazioni dovrebbero essere fatte ogni volta che si trova
 			//      una nuova soluzione migliore globale oppure non si è torvata alcun
 			//      guadagno partendo dalla città i-esima
 			
-			current_solution = best_solution; // TODO dovrebbe essere
-			  								  //	  una copia
+			current_solution = (Solution)best_solution.clone();
 
 			//il guadagno iniziale è 0
 			best_gain = 0;
@@ -111,10 +132,10 @@ public class LK_Intesifier implements Intensifier {
 			added_Edges = new HashSet<Edge>();
 			
 			//gli insiemi degli archi x e y, e il vettore di guadagni sono vuoti
-			x_Edges = new Edge[n];
-			y_Edges = new Edge[n];
+			x_Edges = new Edge[city_number];
+			y_Edges = new Edge[city_number];
 			
-			gains = new int[n];
+			gains = new int[city_number];
 			
 			//nuova città iniziale
 			t1_current = cities[i];
@@ -209,8 +230,7 @@ public class LK_Intesifier implements Intensifier {
 						if(G2_star>best_gain){
 							
 							//il tour è più corto del migliore trovato
-							// TODO dovrebbe essere una copia
-							best_solution = current_solution;
+							best_solution = (Solution)current_solution.clone();
 							
 							//aggiorna il guadagno migliore trovato
 							best_gain = G2_star;
@@ -232,8 +252,7 @@ public class LK_Intesifier implements Intensifier {
 								// è trovato alcun miglioramento cambia x2
 								
 								// backtracking
-								current_solution = best_solution; // TODO dovrebbe essere
-																  //      una copia
+								current_solution = (Solution)best_solution.clone();
 							
 								//TODO valutare di aggiungere x2 solo dopo questo controllo
 								//FIXME x_Edges.remove(1);
@@ -322,8 +341,7 @@ public class LK_Intesifier implements Intensifier {
 								if(Gi_star>best_gain){
 									
 									//il tour è più corto del migliore trovato
-									// TODO dovrebbe essere una copia
-									best_solution = current_solution;
+									best_solution = (Solution)current_solution.clone();
 									
 									//aggiorna il guadagno migliore trovato
 									best_gain = Gi_star;
@@ -338,7 +356,7 @@ public class LK_Intesifier implements Intensifier {
 								EdgeGain_Pair yi_pair = getNextY(xi, i);
 								
 								//è possibile valutare un altro scambio?
-								if(yi_pair!=null){
+								if(yi_pair!=null && i< max_lambda && i<city_number){
 									
 									//nuovo arco yi
 									yi = yi_pair.edge;
@@ -369,7 +387,7 @@ public class LK_Intesifier implements Intensifier {
 							//	   dovrebbe bastare copiare la soluzione iniziale a quella
 							//	   corrente e svuotare la lista di archi aggiunti
 							
-							current_solution = best_solution; //TODO dovrebbe essere una copia
+							current_solution = (Solution)best_solution.clone();
 
 							//TODO valutare l'uso di clear()
 							added_Edges = new HashSet<Edge>();
@@ -479,8 +497,7 @@ public class LK_Intesifier implements Intensifier {
 									if(G3_star>best_gain){
 											
 										//il tour è più corto del migliore trovato
-										// TODO dovrebbe essere una copia
-										best_solution = current_solution;
+										best_solution = (Solution)current_solution.clone();
 											
 										//aggiorna il guadagno migliore trovato
 										best_gain = G3_star;
@@ -519,7 +536,8 @@ public class LK_Intesifier implements Intensifier {
 										
 									//esistono aun arco per sostituire xi?
 									//porta un guadagno migliore?
-									while(yi!=null && Gi>best_gain){
+									while(yi!=null && Gi>best_gain && i < max_lambda
+																		&& i < city_number){
 											
 										i++;
 											
@@ -551,8 +569,7 @@ public class LK_Intesifier implements Intensifier {
 										if(Gi_star>best_gain){
 												
 											//il tour è più corto del migliore trovato
-											// TODO dovrebbe essere una copia
-											best_solution = current_solution;
+											best_solution = (Solution)current_solution.clone();
 												
 											//aggiorna il guadagno migliore trovato
 											best_gain = Gi_star;
@@ -582,7 +599,7 @@ public class LK_Intesifier implements Intensifier {
 									if(!backtrack)
 										break;
 									
-									current_solution = best_solution; //TODO copia
+									current_solution = (Solution)best_solution.clone();
 									
 									//TODO valutare l'uso di clear()
 									added_Edges = new HashSet<Edge>();
@@ -715,8 +732,7 @@ public class LK_Intesifier implements Intensifier {
 								if(G4_star>best_gain){
 										
 									//il tour è più corto del migliore trovato
-									// TODO dovrebbe essere una copia
-									best_solution = current_solution;
+									best_solution = (Solution)current_solution.clone();
 										
 									//aggiorna il guadagno migliore trovato
 									best_gain = G4_star;
@@ -756,7 +772,8 @@ public class LK_Intesifier implements Intensifier {
 									
 								//esistono aun arco per sostituire xi?
 								//migliora il guadagno?
-								while(yi!=null && Gi>best_gain){
+								while(yi!=null && Gi>best_gain && i < max_lambda
+																	&& i < city_number){
 									//TODO ottenere gi e registrarlo con gli archi
 										
 										
@@ -794,8 +811,7 @@ public class LK_Intesifier implements Intensifier {
 									if(Gi_star>best_gain){
 											
 										//il tour è più corto del migliore trovato
-										// TODO dovrebbe essere una copia
-										best_solution = current_solution;
+										best_solution = (Solution)current_solution.clone();
 											
 										//aggiorna il guadagno migliore trovato
 										best_gain = Gi_star;
@@ -828,7 +844,7 @@ public class LK_Intesifier implements Intensifier {
 							if(!backtrack)
 								break;
 							
-							current_solution = best_solution; //TODO copia
+							current_solution = (Solution)best_solution.clone();
 							
 							//TODO valutare l'uso di clear()
 							added_Edges = new HashSet<Edge>();
@@ -843,7 +859,7 @@ public class LK_Intesifier implements Intensifier {
 					if(!backtrack)
 						break;
 					
-					current_solution = best_solution; //TODO copia
+					current_solution = (Solution)best_solution.clone();
 					
 				}
 				//fine loop su x2
@@ -851,7 +867,7 @@ public class LK_Intesifier implements Intensifier {
 				if(!backtrack)
 					break;
 				
-				current_solution = best_solution; //TODO copia
+				current_solution = (Solution)best_solution.clone();
 				
 			}
 			//fine loop su y1
@@ -859,7 +875,7 @@ public class LK_Intesifier implements Intensifier {
 			if(!backtrack)
 				break;
 			
-			current_solution = best_solution; //TODO copia
+			current_solution = (Solution)best_solution.clone();
 			
 			added_Edges.clear();
 			
@@ -1136,7 +1152,7 @@ public class LK_Intesifier implements Intensifier {
 				Edge x3_next = createEdge(t5, t6_next);
 				Edge x3_prev = createEdge(t6_prev, t5);
 				
-				x3 = x3_next.getLength() < x3_prev.getLength() ? x3_next : x3_prev;
+				x3 = x3_next.getLength() > x3_prev.getLength() ? x3_next : x3_prev;
 				
 			}
 			else if(between(current_solution, t4, t5, t1)){
@@ -1325,7 +1341,7 @@ public class LK_Intesifier implements Intensifier {
 		EdgeGain_Pair yi_pair = new EdgeGain_Pair(null, 0, 0);
 		
 		//miglior indice di ottimalità trovato
-		int opt = 0;
+		int opt = Integer.MIN_VALUE;
 				
 		//numero massimo di archi yi da valutare
 		int iterations = max_yi;
