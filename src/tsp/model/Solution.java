@@ -11,4 +11,6 @@ public interface Solution extends Cloneable {
 	public void flip(City a, City b);
 	
 	public int length();
+
+	public Object clone();
 }

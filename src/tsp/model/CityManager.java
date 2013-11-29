@@ -28,6 +28,10 @@ public class CityManager {
 		return distances[a.city-1][b.city-1];
 	}
 	
+	public City[] getCities(){
+		return cities.clone();
+	}
+	
 	//metodo per la creazione di archi tra città
 	public Edge getEdge(City a, City b){
 		return new Edge(a, b, cost(a, b));
