@@ -5,38 +5,43 @@ import tsp.model.City;
 public class Client {
 	private Segment parent;
 	private City elemento;
-	private int pos_rel;
 	private Client next;
 	private Client previous;
-	public Segment getParent() {
-		return parent;
+	
+	public Client(City c, Segment s){
+		this.parent=s;
+		this.elemento=c;
+				
 	}
-	public void setParent(Segment parent) {
-		this.parent = parent;
+	
+	City getCity(){
+		return this.elemento;
 	}
-	public City getElemento() {
-		return elemento;
-	}
-	public void setElemento(City elemento) {
-		this.elemento = elemento;
-	}
-	public int getPos_rel() {
-		return pos_rel;
-	}
-	public void setPos_rel(int pos_rel) {
-		this.pos_rel = pos_rel;
-	}
+
 	public Client getNext() {
-		return next;
+		// TODO Auto-generated method stub
+		if(parent.getReverse()==1){return this.next;}
+		if(parent.getReverse()==-1){ return this.previous;}
+	return null;
 	}
-	public void setNext(Client next) {
-		this.next = next;
+
+	public void setNext(Client next2) {
+		this.next=next2;
+		// TODO Auto-generated method stub
+		
 	}
+
+	public void setPrevious(Client a) {
+		// TODO Auto-generated method stub
+		this.previous=a;
+	}
+
 	public Client getPrevious() {
-		return previous;
+		// TODO Auto-generated method stub
+		if(parent.getReverse()==1){return this.previous;}
+		if(parent.getReverse()==-1){ return this.next;}
+		return null;
 	}
-	public void setPrevious(Client previous) {
-		this.previous = previous;
-	}
+	
 
 }
