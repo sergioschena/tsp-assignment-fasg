@@ -1,6 +1,5 @@
 package Solution_Data_Structure;
 
-import java.util.*;
 
 import tsp.model.City;
 import tsp.model.Solution;
