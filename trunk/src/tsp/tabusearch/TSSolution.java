@@ -55,6 +55,9 @@ public class TSSolution implements Solution {
 	}
 	
 	private boolean between(int pa, int pb, int pc) {
+		if(pa==pc)
+			return false;
+		
 		return pa > pc ? 
 				pb < pc || pa < pb :
 				pa < pb && pb < pc;
@@ -64,6 +67,9 @@ public class TSSolution implements Solution {
 	public void flip(City a, City b) {
 		int src = pos(next(a));
 		int dst = pos(b);
+		
+		if(src==dst)
+			return;
 		
 		int cnt = (src<dst ? dst-src-1: size+dst-src-1)/2; 
 		for(; cnt >= 0; cnt--){
