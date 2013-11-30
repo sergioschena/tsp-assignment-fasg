@@ -388,12 +388,23 @@ public class LK_Intesifier implements Intensifier {
 							//	   corrente e svuotare la lista di archi aggiunti
 							
 							current_solution = (Solution)best_solution.clone();
+							
+							flip(current_solution, t4,t1);
 
 							//TODO valutare l'uso di clear()
 							added_Edges = new HashSet<Edge>();
 							added_Edges.add(y1);
+							
 						}
 						//fine loop su y2
+						
+						//se deve essere fatto il backtrack, significa che non è stata
+						//trovata una soluzione migliore di quella iniziale, quindi bisogna
+						//provare con la seconda scelta di x2. bisogna dunque ritornare alla
+						//soluzione iniziale, dato che la corrente potrebbe essere diversa da
+						//essa
+						if(backtrack)
+							current_solution = (Solution)best_solution.clone();
 						
 					}
 					else {
@@ -449,6 +460,7 @@ public class LK_Intesifier implements Intensifier {
 							
 							// in base alla posizione di t5 si può decidere come
 							// ricostruire il tour
+							//TODO verificare la correttezza del between quando t2 = t3 
 							if(between(current_solution, t2, t5, t3)){
 								//prendendo un qualsiasi arco x con estremo t5 si
 								//ritorna a un tour accettabile
@@ -554,7 +566,7 @@ public class LK_Intesifier implements Intensifier {
 										xi = createEdge(t_2im1, t2i);
 										
 										//flip per sostituire xi e yi-1* con yi e yi*
-										flip(current_solution, t_2im2, t_2im1);
+										flip(current_solution, t_2im1, t_2im2);
 											
 										//arco yi*
 										yi_star = createEdge(t2i, t1);
@@ -600,6 +612,9 @@ public class LK_Intesifier implements Intensifier {
 										break;
 									
 									current_solution = (Solution)best_solution.clone();
+									
+									//flip(current_solution,t4,t1);
+									//flip(current_solution,t5,t4);
 									
 									//TODO valutare l'uso di clear()
 									added_Edges = new HashSet<Edge>();
@@ -659,6 +674,11 @@ public class LK_Intesifier implements Intensifier {
 									//non ci sono archi candidati a essere y3
 									if(!backtrack)
 										break;
+									
+									//continuare significa provare con un altro arco y2,
+									//quindi bisogna eliminare y2
+									added_Edges.remove(y2);
+									
 									continue;
 								}
 								
@@ -795,7 +815,7 @@ public class LK_Intesifier implements Intensifier {
 									x_Edges[i-1] = xi;
 									
 									//flip per sostituire xi e yi-1* con yi e yi*
-									flip(current_solution, t_2im2, t_2im1);
+									flip(current_solution, t_2im1, t_2im2);
 									
 									//arco yi*
 									yi_star = createEdge(t2i, t1);
@@ -846,6 +866,8 @@ public class LK_Intesifier implements Intensifier {
 							
 							current_solution = (Solution)best_solution.clone();
 							
+							//flip(current_solution, t4,t1);
+							
 							//TODO valutare l'uso di clear()
 							added_Edges = new HashSet<Edge>();
 							added_Edges.add(y1);
@@ -869,6 +891,8 @@ public class LK_Intesifier implements Intensifier {
 				
 				current_solution = (Solution)best_solution.clone();
 				
+				added_Edges.clear();
+				
 			}
 			//fine loop su y1
 			
@@ -877,7 +901,7 @@ public class LK_Intesifier implements Intensifier {
 			
 			current_solution = (Solution)best_solution.clone();
 			
-			added_Edges.clear();
+			
 			
 		}
 		//fine loop su x1
@@ -987,10 +1011,10 @@ public class LK_Intesifier implements Intensifier {
 		//città precedente a t4
 		City t4_prev = prev(current_solution,t4);
 		
-		//Lista di città più vicine a t2
+		//Lista di città più vicine a t4
 		City[] list = city_manager.getNearest(t4);
 		
-		//Guadagno parziale G1
+		//Guadagno parziale G2
 		int G1 = gains[0];
 				
 		//indice degli archi candidati
@@ -1232,7 +1256,7 @@ public class LK_Intesifier implements Intensifier {
 		boolean city_is_next = true;
 		
 		//miglior indice di ottimalità trovato
-		int opt = 0;
+		int opt = Integer.MIN_VALUE;
 				
 		//numero massimo di archi y3 da valutare
 		int iterations = max_yi;
@@ -1326,7 +1350,7 @@ public class LK_Intesifier implements Intensifier {
 		City t2i = xi.getArrive();
 		
 		//città t2i-1
-		City t_2im1 = xi.getDepart();
+		City t2i_prev = prev(current_solution,t2i);
 		
 		//lista delle città più vicine a t2i
 		City[] list = city_manager.getNearest(t2i);
@@ -1354,7 +1378,7 @@ public class LK_Intesifier implements Intensifier {
 			//città t2i+1
 			City t_2ip1 = list[k];
 			
-			if(t_2ip1 == t1_current || t_2ip1 == t_2im1){
+			if(t_2ip1 == t1_current || t_2ip1 == t2i_prev){
 				//l'arco (t2i,t2i+1) non può essere candidato
 				continue;
 			}
@@ -1434,11 +1458,9 @@ public class LK_Intesifier implements Intensifier {
 	// città in mezzo ad altre due
 	private boolean between(Solution s, City a, City b, City c){
 		
-		boolean res = s.between(a, b, c);
-		
 		if(direction)
-			return res;
-		return !res;
+			return s.between(a, b, c);
+		return s.between(c, b, a);
 	}
 	
 	// scambio di due archi
@@ -1450,8 +1472,8 @@ public class LK_Intesifier implements Intensifier {
 			c1 = a;
 			c2 = b;
 		} else {
-			c1 = s.previous(a);
-			c2 = s.previous(b);
+			c2 = s.previous(a);
+			c1 = s.previous(b);
 		}
 		
 		s.flip(c1, c2);
@@ -1459,9 +1481,9 @@ public class LK_Intesifier implements Intensifier {
 	
 	// la creazione di un arco è dipendente dalla direzione
 	private Edge createEdge(City c1, City c2){
-		if(direction)
+		//if(direction)
 			return city_manager.getEdge(c1, c2);
-		return city_manager.getEdge(c2, c1);
+		//return city_manager.getEdge(c2, c1);
 	}
 	
 //------------------------------------------------------------------------------------------
