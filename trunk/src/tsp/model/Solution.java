@@ -13,4 +13,7 @@ public interface Solution extends Cloneable {
 	public int length();
 
 	public Object clone();
+	
+	public Solution getSolutionFromCities(City[] cities);
+	
 }
