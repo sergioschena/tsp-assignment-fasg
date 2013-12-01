@@ -10,13 +10,13 @@ public class Test_LK {
 	 */
 	public static void main(String[] args) {
 		
-		City cities[] = createCities10();
+		City cities[] = createCities76();
 		
 		CityManager manager = new CityManager(cities);
 		
 		LK_Intesifier intensifier = new LK_Intesifier(manager);
 		
-		intensifier.setParam(8, 5, 5, 5, 50);
+		intensifier.setParam(76, 15, 5, 5, 50);
 		
 		TSSolution solution = new TSSolution(cities);
 		
@@ -34,10 +34,13 @@ public class Test_LK {
 		System.out.println("Time = "+secs);
 		
 		System.out.println(best_sol + " -> " + evaluate(best_sol, manager, cities[0]));
-
+		
+		System.out.println(evaluate(best_sol, manager, cities[0]));
 	}
 	
 	public static City[] createCities10(){
+		
+		//opt = 266
 		
 		City cities[] = new City[10];
 		
@@ -101,6 +104,8 @@ public static City[] createCities20(){
 	}
 	
 public static City[] createCities76(){
+	
+	// opt = 538
 		
 		City cities[] = new City[76];
 		

@@ -700,13 +700,13 @@ public class LK_Intesifier implements Intensifier {
 								//città t8 scelta
 								City t8 = y3_pair.edge_city;
 								
-								//arco x4 scelto
-								Edge x4;
+								//arco x4 scelto. bisogna inserire t8 come arrivo per far
+								//funzionare il metodo getNextY. lo scambio è indifferente
+								//dato che l'arco è equivalente a un arco (t8,t7)
+								Edge x4 = createEdge(t7, t8);
 								
 								if(t8_is_next){
 									// t8 è successivo a t7
-									
-									x4 = createEdge(t7, t8);
 									
 									//necessari 4 scambi:
 									//			flip(t1,t2,t3,t4)
@@ -722,8 +722,6 @@ public class LK_Intesifier implements Intensifier {
 								}
 								else {
 									// t8 è precendente a t7
-									
-									x4 = createEdge(t8, t7);
 									
 									//necessari 3 scambi
 									//			flip(t1,t2,t8,t7)
@@ -1176,7 +1174,7 @@ public class LK_Intesifier implements Intensifier {
 				Edge x3_next = createEdge(t5, t6_next);
 				Edge x3_prev = createEdge(t6_prev, t5);
 				
-				x3 = x3_next.getLength() > x3_prev.getLength() ? x3_next : x3_prev;
+				x3 = x3_next.getLength() < x3_prev.getLength() ? x3_next : x3_prev;
 				
 			}
 			else if(between(current_solution, t4, t5, t1)){
