@@ -60,6 +60,7 @@ public class PSO_Explorer implements Explorer {
 		
 		int i = 0;
 		
+		//FIXME altri criteri di terminazione?
 		while(i < max_iter){
 			
 			//migliora le particelle e aggiorna le nuove particelle globali e locali
@@ -80,6 +81,8 @@ public class PSO_Explorer implements Explorer {
 		
 		//migliora la soluzione della particella
 		particle.position = exploiter.improve(particle.position);
+		
+		particle.updateEdges();
 		
 		int old_length = particle.getLocalBestLength();
 		

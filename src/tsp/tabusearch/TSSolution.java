@@ -130,5 +130,11 @@ public class TSSolution implements Solution {
 		}
 		
 	}
+	
+	public Solution getSolutionFromCities(City[] cities){
+		return new TSSolution(cities);
+	}
+
+	
 
 }

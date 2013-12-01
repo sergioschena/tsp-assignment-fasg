@@ -1,5 +1,7 @@
 package PSO;
 
+import java.util.Comparator;
+
 import tsp.model.Edge;
 
 public class PSO_Edge {
@@ -21,4 +23,14 @@ public class PSO_Edge {
 		return edge;
 	}
 
+}
+
+class PSO_Edge_Comparator implements Comparator<PSO_Edge>{
+
+	@Override
+	public int compare(PSO_Edge e0, PSO_Edge e1) {
+		
+		return Double.compare(e1.probability, e0.probability);
+	}
+	
 }
