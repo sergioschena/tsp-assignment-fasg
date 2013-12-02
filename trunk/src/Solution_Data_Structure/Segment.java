@@ -40,7 +40,13 @@ public class Segment {
 		// TODO Auto-generated method stub
 		this.reverse=i;
 	}
-	
+
+	public int getID() {
+		// TODO Auto-generated method stub
+		return this.ID;
+	}
+
+		
 
 	
 

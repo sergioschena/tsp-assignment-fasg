@@ -39,7 +39,7 @@ public class Client {
 	public Client getPrevious() {
 		// TODO Auto-generated method stub
 		if(parent.getReverse()==1){return this.previous;}
-		if(parent.getReverse()==-1){ return this.next;}
+		if(parent.getReverse()==-1){return this.next;}
 		return null;
 	}
 	
