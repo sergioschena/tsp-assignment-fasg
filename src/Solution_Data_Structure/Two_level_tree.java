@@ -93,17 +93,44 @@ public class Two_level_tree implements Solution {
 		// TODO Auto-generated method stub
 		Segment sa=null;
 		Segment sb=null;
+		Client ca=null;
+		Client cb=null;
+		
 		for(Segment s:segmenti){
 			if(s.isCity(a)!=null){
+				ca=s.isCity(a);
 				sa=s;
 			}
 			if(s.isCity(b)!=null){
+				cb=s.isCity(b);
 				sb=s;
-			}
+							}
 		}
 		
-		sa.setReverse(-sa.getReverse());
-		sb.setReverse(-sb.getReverse());
+		//if(sa.getID()==sb.getID()){
+			//sa.setReverse(-sa.getReverse());
+			//sa.isCity(a).setNext(sa.isCity(b).getNext());
+		//}  ha senso fare il flip di due città nello stesso segmento??
+		
+		if(sa.getID()!=sb.getID()){
+			sb.setReverse(-sb.getReverse());
+			int i=segmenti.indexOf(sa);
+			int j=segmenti.indexOf(sb);
+			i++;
+			Segment t;
+			while(i!=j){
+				t=segmenti.get(i);
+				t.setReverse(-t.getReverse());
+				i++;
+			}
+			Client temp;
+			temp=ca.getNext();
+			ca.setNext(cb);
+			temp.setNext(cb.getNext());
+			cb.setPrevious(ca);
+			cb.getNext().setPrevious(ca);
+		}
+		
 		
 	}
 
