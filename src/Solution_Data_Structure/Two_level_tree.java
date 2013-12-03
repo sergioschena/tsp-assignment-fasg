@@ -1,6 +1,6 @@
 package Solution_Data_Structure;
 
-import java.util.*;
+import java.util.LinkedList;
 
 import tsp.model.City;
 import tsp.model.Solution;
@@ -138,6 +138,35 @@ public class Two_level_tree implements Solution {
 	public int length() {
 		// TODO Auto-generated method stub
 		return 0;
+	}
+
+	@Override
+	public Solution getSolutionFromCities(City[] cities) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public City startFrom() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void updateLength(int delta) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void setLength(int length) {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	@Override
+	public Object clone(){
+		return null;
 	}
 
 }

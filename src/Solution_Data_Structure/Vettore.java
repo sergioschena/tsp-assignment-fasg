@@ -95,9 +95,33 @@ public class Vettore implements Solution {
 		return costo;
 	}
 
-	
-	
+	@Override
+	public Solution getSolutionFromCities(City[] cities) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
-	
+	@Override
+	public City startFrom() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
+	@Override
+	public void updateLength(int delta) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void setLength(int length) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public Object clone(){
+		return null;
+	}
+	
 }

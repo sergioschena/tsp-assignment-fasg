@@ -2,6 +2,7 @@ package tsp.tabusearch;
 
 import tsp.model.City;
 import tsp.model.CityManager;
+import tsp.model.Solution;
 
 public class TSObjectiveFunction {
 	//TODO: change Solution interface according to this implementation
@@ -15,7 +16,7 @@ public class TSObjectiveFunction {
 		return cityManager.cost(a, b);
 	}
 	
-	public int evaluate(TSSolution s){
+	public int evaluate(Solution s){
 		int val = 0;
 		City start = s.startFrom();
 		City act = start;

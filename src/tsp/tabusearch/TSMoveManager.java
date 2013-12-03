@@ -2,6 +2,7 @@ package tsp.tabusearch;
 
 import tsp.model.City;
 import tsp.model.CityManager;
+import tsp.model.Solution;
 
 
 public class TSMoveManager {
@@ -16,7 +17,7 @@ public class TSMoveManager {
 		this.cityManager = cityManager;
 	}
 	
-	public Move2Opt nextMove(TSSolution s){
+	public Move2Opt nextMove(Solution s){
 		Move2Opt best = null;
 		int bestValue = Integer.MAX_VALUE;
 		
@@ -32,7 +33,7 @@ public class TSMoveManager {
 			for(xchg = s.next(next); !xchg.equals(start) ; xchg = s.next(xchg)){
 				candidate.d = xchg;
 				candidate.c = s.next(xchg);				
-				if(candidate.updateEvaluation() < bcValue && !tabuList.isTabu(candidate)){
+				if(candidate.updateEvaluation() < bcValue && !tabuList.isTabu(s,candidate)){
 					bestCandidate = (Move2Opt) candidate.clone();
 					bcValue = bestCandidate.eval;
 				}
@@ -47,7 +48,7 @@ public class TSMoveManager {
 		return best;
 	}
 	
-	public Move2Opt nextMoveTrunc(TSSolution s){
+	public Move2Opt nextMoveTrunc(Solution s){
 		Move2Opt best = null;
 		int bestMoveValue = Integer.MAX_VALUE;
 		
@@ -63,7 +64,7 @@ public class TSMoveManager {
 			for(City tc : neighbors){
 				candidate.c = tc;
 				candidate.d = s.previous(tc);
-				if(candidate.updateEvaluation() < bestCandidateValue && !tabuList.isTabu(candidate)){
+				if(candidate.updateEvaluation() < bestCandidateValue && !tabuList.isTabu(s,candidate)){
 					bestCandidate = (Move2Opt) candidate.clone();
 					bestCandidateValue = bestCandidate.eval;
 				}
