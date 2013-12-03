@@ -16,4 +16,10 @@ public interface Solution extends Cloneable {
 	
 	public Solution getSolutionFromCities(City[] cities);
 	
+	public City startFrom();
+	
+	public void updateLength(int delta);
+	
+	public void setLength(int length);
+	
 }

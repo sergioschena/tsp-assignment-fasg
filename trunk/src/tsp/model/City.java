@@ -3,7 +3,7 @@ package tsp.model;
 public class City {
 	double x;
 	double y;
-	int city;
+	public int city;
 	public boolean visited;
 	
 	

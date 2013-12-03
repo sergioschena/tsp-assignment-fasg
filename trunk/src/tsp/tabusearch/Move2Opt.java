@@ -66,13 +66,6 @@ public class Move2Opt implements Move {
 	
 	@Override
 	public void operateOn(Solution sol) {
-		//TODO implementare aggiornamento della soluzione con la mossa corrente
-		// aggiornare interfaccia Solution???
-		// deve clonare???
-		
-	}
-	
-	public void operateOn(TSSolution sol) {
 		sol.flip(a, d);
 		sol.updateLength(eval);
 	}
