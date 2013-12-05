@@ -10,17 +10,46 @@ import tsp.model.Solution;
  * NOT NEEDED 
  */
 public class Test {
-
-	
 	
 	public static void main(String[] args) {
 		
 		//testTabuList();
 		//testMoveManager();
 		testTabuSearch();
-		
+		//test3Opt();
 	}
 	
+	private static void test3Opt() {
+		
+		City[] cs = new City[15];
+		for(int i=0; i<cs.length; i++){
+			cs[i] = new City(i+1, 2*i, 3*i);
+		}
+		
+		City a = cs[1];
+		City b = cs[2];
+		City c = cs[6];
+		City d = cs[5];
+		City e = cs[11];
+		City f = cs[10];
+		
+		TSSolution s = new TSSolution(cs);
+		TSObjectiveFunction of = new TSObjectiveFunction(new CityManager(cs));
+		Move3Opt ms[] = new Move3Opt[6];
+		ms[0] = new Move3Opt(a, b, a, d, e, f, of); // KO
+		ms[1] = new Move3Opt(a, b, c, b, e, f, of); // OK
+		ms[2] = new Move3Opt(a, b, c, d, c, d, of); // OK
+		ms[3] = new Move3Opt(a, b, c, d, a, f, of); // OK
+		ms[4] = new Move3Opt(a, b, c, d, b, a, of); // KO
+		ms[5] = new Move3Opt(a, b, a, d, e, f, of); // KO
+		
+		for(Move3Opt m : ms){
+			boolean c1 = s.between(m.a, m.b, m.c);
+			boolean c2 = s.between(m.c, m.e, m.a);
+			System.out.println("c1: "+c1+" - c2: "+c2);
+		}
+	}
+
 	public static void testTabuList(){
 		City[] c = new City[15];
 		for(int i=0; i<c.length; i++){
@@ -239,11 +268,11 @@ public class Test {
 	}
 	
 	public static void testTabuSearch(){
-		City[] cities = createCities76();
-		CityManager cityManager = new CityManager(cities);
+		City[] cities = createEil51();
+		CityManager cityManager = new CityManager(cities,15);
 		AspirationCriteria aspirationCriteria = BestEverAspirationCriteria.getInstance();
 		Solution start = new TSSolution(cities);
-		int startTenure = 0;
+		int startTenure = 5;
 		int maxIterations = 100;
 		int maxNotImprovingIterations = 10;
 		TabuSearch ts = new TabuSearch(cityManager, aspirationCriteria, startTenure, maxNotImprovingIterations, maxIterations);
@@ -267,6 +296,8 @@ public class Test {
 			
 			return ret;
 		}
+		
+		
 	}
 	
 	private static class FalseAspCrit implements AspirationCriteria {
@@ -357,6 +388,130 @@ public class Test {
 		
 		return cities;
 	}
+	
+	private static City[] createEil51(){
+		
+		// opt = 538
+			
+		City cities[] = new City[51];			
+		
+		cities[1-1] = new City(1,37,52);
+		cities[2-1] = new City(2,49,49);
+		cities[3-1] = new City(3,52,64);
+		cities[4-1] = new City(4,20,26);
+		cities[5-1] = new City(5,40,30);
+		cities[6-1] = new City(6,21,47);
+		cities[7-1] = new City(7,17,63);
+		cities[8-1] = new City(8,31,62);
+		cities[9-1] = new City(9,52,33);
+		cities[10-1] = new City(10,51,21);
+		cities[11-1] = new City(11,42,41);
+		cities[12-1] = new City(12,31,32);
+		cities[13-1] = new City(13,5,25);
+		cities[14-1] = new City(14,12,42);
+		cities[15-1] = new City(15,36,16);
+		cities[16-1] = new City(16,52,41);
+		cities[17-1] = new City(17,27,23);
+		cities[18-1] = new City(18,17,33);
+		cities[19-1] = new City(19,13,13);
+		cities[20-1] = new City(20,57,58);
+		cities[21-1] = new City(21,62,42);
+		cities[22-1] = new City(22,42,57);
+		cities[23-1] = new City(23,16,57);
+		cities[24-1] = new City(24,8,52);
+		cities[25-1] = new City(25,7,38);
+		cities[26-1] = new City(26,27,68);
+		cities[27-1] = new City(27,30,48);
+		cities[28-1] = new City(28,43,67);
+		cities[29-1] = new City(29,58,48);
+		cities[30-1] = new City(30,58,27);
+		cities[31-1] = new City(31,37,69);
+		cities[32-1] = new City(32,38,46);
+		cities[33-1] = new City(33,46,10);
+		cities[34-1] = new City(34,61,33);
+		cities[35-1] = new City(35,62,63);
+		cities[36-1] = new City(36,63,69);
+		cities[37-1] = new City(37,32,22);
+		cities[38-1] = new City(38,45,35);
+		cities[39-1] = new City(39,59,15);
+		cities[40-1] = new City(40,5,6);
+		cities[41-1] = new City(41,10,17);
+		cities[42-1] = new City(42,21,10);
+		cities[43-1] = new City(43,5,64);
+		cities[44-1] = new City(44,30,15);
+		cities[45-1] = new City(45,39,10);
+		cities[46-1] = new City(46,32,39);
+		cities[47-1] = new City(47,25,32);
+		cities[48-1] = new City(48,25,55);
+		cities[49-1] = new City(49,48,28);
+		cities[50-1] = new City(50,56,37);
+		cities[51-1] = new City(51,30,40);
+
+		
+		return cities;
+	}
+	
+	private static City[] createBerlin52(){
+		
+	// opt = 538
+		
+		City cities[] = new City[52];			
+		
+		cities[1-1] = new City(1,565,575);
+		cities[2-1] = new City(2,25,185);
+		cities[3-1] = new City(3,345,750);
+		cities[4-1] = new City(4,945,685);
+		cities[5-1] = new City(5,845,655);
+		cities[6-1] = new City(6,880,660);
+		cities[7-1] = new City(7,25,230);
+		cities[8-1] = new City(8,525,1000);
+		cities[9-1] = new City(9,580,1175);
+		cities[10-1] = new City(10,650,1130);
+		cities[11-1] = new City(11,1605,620); 
+		cities[12-1] = new City(12,1220,580);
+		cities[13-1] = new City(13,1465,200);
+		cities[14-1] = new City(14,1530,5);
+		cities[15-1] = new City(15,845,680);
+		cities[16-1] = new City(16,725,370);
+		cities[17-1] = new City(17,145,665);
+		cities[18-1] = new City(18,415,635);
+		cities[19-1] = new City(19,510,875);
+		cities[20-1] = new City(20,560,365);
+		cities[21-1] = new City(21,300,465);
+		cities[22-1] = new City(22,520,585);
+		cities[23-1] = new City(23,480,415);
+		cities[24-1] = new City(24,835,625);
+		cities[25-1] = new City(25,975,580);
+		cities[26-1] = new City(26,1215,245);
+		cities[27-1] = new City(27,1320,315);
+		cities[28-1] = new City(28,1250,400);
+		cities[29-1] = new City(29,660,180);
+		cities[30-1] = new City(30,410,250);
+		cities[31-1] = new City(31,420,555);
+		cities[32-1] = new City(32,575,665);
+		cities[33-1] = new City(33,1150,1160);
+		cities[34-1] = new City(34,700,580);
+		cities[35-1] = new City(35,685,595);
+		cities[36-1] = new City(36,685,610);
+		cities[37-1] = new City(37,770,610);
+		cities[38-1] = new City(38,795,645);
+		cities[39-1] = new City(39,720,635);
+		cities[40-1] = new City(40,760,650);
+		cities[41-1] = new City(41,475,960);
+		cities[42-1] = new City(42,95,260);
+		cities[43-1] = new City(43,875,920);
+		cities[44-1] = new City(44,700,500);
+		cities[45-1] = new City(45,555,815);
+		cities[46-1] = new City(46,830,485);
+		cities[47-1] = new City(47,1170,65);
+		cities[48-1] = new City(48,830,610);
+		cities[49-1] = new City(49,605,625);
+		cities[50-1] = new City(50,595,360);
+		cities[51-1] = new City(51,1340,725);
+		cities[52-1] = new City(52,1740,245);
+		
+		return cities;
+	}		
 	
 	private static City[] createCities76(){
 	

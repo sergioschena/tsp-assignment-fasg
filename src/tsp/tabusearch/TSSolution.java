@@ -110,10 +110,10 @@ public class TSSolution implements Solution {
 	
 	@Override
 	public String toString(){
-		StringBuffer sb = new StringBuffer("Tour:");
+		StringBuffer sb = new StringBuffer();
 		for(City c : cities){
 			//sb.append(" "+c.getCity()+" ("+c.getX()+", "+c.getY()+") ");
-			sb.append(" "+c.getCity()+" - ");
+			sb.append(c.getCity()+" - ");
 		}
 		return sb.toString();
 	}

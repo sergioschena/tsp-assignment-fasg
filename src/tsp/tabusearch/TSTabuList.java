@@ -38,6 +38,31 @@ public class TSTabuList {
 		this.criteria = criteria;
 	}
 	
+	public void addTabu(Move m){	
+		if(m instanceof Move2Opt){
+			addTabu((Move2Opt)m);
+		}else{
+			addTabu((Move3Opt)m);
+		}
+	}
+	
+	/** delete a move from the tabu list*/
+	public void deleteTabu(Move m){		
+		if(m instanceof Move2Opt){
+			deleteTabu((Move2Opt)m);
+		}else{
+			deleteTabu((Move3Opt)m);
+		}
+	}
+	
+	/** delete a move from the tabu list*/
+	public void resetTabuTenure(Move m){		
+		if(m instanceof Move2Opt){
+			resetTabuTenure((Move2Opt)m);
+		}else{
+			resetTabuTenure((Move3Opt)m);
+		}
+	}
 	
 	/** add a move in the tabu list */	
 	public void addTabu(Move2Opt m){		
@@ -57,10 +82,40 @@ public class TSTabuList {
 		resetTabuEdgeTenure(new TabuEdge(m.b, m.c));
 	}
 	
+	/** add a move in the tabu list */	
+	public void addTabu(Move3Opt m){		
+		addTabuEdge(new TabuEdge(m.a, m.f));
+		addTabuEdge(new TabuEdge(m.b, m.c));
+		addTabuEdge(new TabuEdge(m.d, m.e));
+	}
+	
+	/** delete a move from the tabu list*/
+	public void deleteTabu(Move3Opt m){		
+		deleteTabuEdge(new TabuEdge(m.a, m.f));
+		deleteTabuEdge(new TabuEdge(m.b, m.c));
+		deleteTabuEdge(new TabuEdge(m.d, m.e));
+	}
+	
+	/** delete a move from the tabu list*/
+	public void resetTabuTenure(Move3Opt m){		
+		resetTabuEdgeTenure(new TabuEdge(m.a, m.f));
+		resetTabuEdgeTenure(new TabuEdge(m.b, m.c));
+		resetTabuEdgeTenure(new TabuEdge(m.d, m.e));
+	}
+	
 	/** check if a move is tabu */
 	public boolean isTabu(Solution current, Move2Opt m){
 		
 		if(tabus.contains(new TabuEdge(m.a, m.b)) || tabus.contains(new TabuEdge(m.d, m.c))){
+			return !criteria.isSatisfiedBy(current,m);
+		}
+		
+		return false;
+	}
+	
+	public boolean isTabu(Solution current, Move3Opt m){
+		
+		if(tabus.contains(new TabuEdge(m.a, m.b)) || tabus.contains(new TabuEdge(m.d, m.c)) || tabus.contains(new TabuEdge(m.f, m.e))){
 			return !criteria.isSatisfiedBy(current,m);
 		}
 		
