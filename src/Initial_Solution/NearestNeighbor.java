@@ -29,7 +29,6 @@ public class NearestNeighbor implements InitialSolutionGenerator{
 			counter++;
 			City[] closer = cm.getNearest(c); 
 			jump=false;
-			//TODO ottimizz: mettere nel vettore solo quelle non visitate 
 			//leggo il vettore delle citta piu vicine e scelgo la prima non visitata come prossima citta da visitare
 			for(int i=0; i<closer.length && jump==false; i++){
 				if (closer[i].visited == false){
