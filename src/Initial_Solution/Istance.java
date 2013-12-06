@@ -41,7 +41,7 @@ public class Istance {
 		return N;
 	}
 	
-	public City[] InstanceGenerator() throws IOException{ //TODO: riceve il file name?
+	public City[] IstanceGenerator() throws IOException{ //TODO: riceve il file name?
 		
 		FileReader f;
 	    f=new FileReader(this.fileName);
