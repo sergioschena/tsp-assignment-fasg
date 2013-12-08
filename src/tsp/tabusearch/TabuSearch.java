@@ -21,7 +21,7 @@ public class TabuSearch implements Intensifier {
 	int maxNotImprovingIterations;
 	int maxIterations;
 	
-	int iterations;
+	public int iterations;
 	
 	public TabuSearch(CityManager cityManager, AspirationCriteria aspirationCriteria, int startTenure, int maxNotImprovingIterations, int maxIterations){
 		this.cityManager = cityManager;
@@ -45,13 +45,15 @@ public class TabuSearch implements Intensifier {
 	}
 	
 	@Override
-	public Solution improve(Solution start) {
+	public Solution improve(Solution start) {		
 		Solution best;
 		Solution current;
 		Move move;
 		int iterations;
 		int notImprovingIterations;
 		int prevLength;
+		
+		tabuList.initialize();
 		
 		objectiveFunction.evaluate(start);
 		current = (Solution) start.clone();

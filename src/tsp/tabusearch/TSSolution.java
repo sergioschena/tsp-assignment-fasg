@@ -105,8 +105,7 @@ public class TSSolution implements Solution {
 	
 	public void setLength(int length){
 		this.length = length;
-	}
-	
+	}	
 	
 	@Override
 	public String toString(){
@@ -134,7 +133,17 @@ public class TSSolution implements Solution {
 	public Solution getSolutionFromCities(City[] cities){
 		return new TSSolution(cities);
 	}
-
 	
-
+	public City get(int index){
+		return cities[index];
+	}
+	
+	public void set(int index, City c){
+		cities[index] = c;
+	}
+	
+	public int getSize() {
+		return size;
+	}
+	
 }
