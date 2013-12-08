@@ -32,6 +32,10 @@ public class CityManager {
 		return cities.clone();
 	}
 	
+	public City getCity(int city){
+		return cities[city-1];
+	}
+	
 	//metodo per la creazione di archi tra città
 	public Edge getEdge(City a, City b){
 		return new Edge(a, b, cost(a, b));
@@ -90,6 +94,37 @@ public class CityManager {
 		for(int i=0; i<this.n; i++){
 			if(i != cIdx){
 				cmp = new CityComparator(c.city-1);
+				dist = distances[cIdx][i];
+				
+				if(onlyAdd){
+					onlyAdd = ((bestNear.size() == (maxNeighbors-1)) ? false : true);
+					bestNear.add(cities[i]);
+					Collections.sort(bestNear, cmp);
+				}else if(distances[cIdx][bestNear.getLast().city-1] > dist){
+					bestNear.removeLast();
+					bestNear.add(cities[i]);
+					Collections.sort(bestNear, cmp);
+				}
+			}
+		}
+		
+		return bestNear.toArray(new City[0]);
+	}
+	
+	public City[] bestCurrentNearestOf(City c){
+		LinkedList<City> bestNear = new LinkedList<City>();
+		
+		int cIdx = c.city - 1;
+		int dist;
+		boolean onlyAdd = true;
+		CityComparator cmp;
+		
+		for(int i=0; i<this.n; i++){
+			if(i != cIdx){
+				cmp = new CityComparator(c.city-1);
+				
+				if(cities[i].visited) continue;
+				
 				dist = distances[cIdx][i];
 				
 				if(onlyAdd){

@@ -2,6 +2,7 @@ package tsp.tabusearch;
 
 import java.util.Random;
 
+import tsp.ga.KnownInstances;
 import tsp.model.City;
 import tsp.model.CityManager;
 import tsp.model.Solution;
@@ -268,13 +269,13 @@ public class Test {
 	}
 	
 	public static void testTabuSearch(){
-		City[] cities = createEil51();
+		City[] cities = KnownInstances.createPr1002();
 		CityManager cityManager = new CityManager(cities,15);
 		AspirationCriteria aspirationCriteria = BestEverAspirationCriteria.getInstance();
 		Solution start = new TSSolution(cities);
 		int startTenure = 5;
-		int maxIterations = 100;
-		int maxNotImprovingIterations = 10;
+		int maxIterations = 1000;
+		int maxNotImprovingIterations = 20;
 		TabuSearch ts = new TabuSearch(cityManager, aspirationCriteria, startTenure, maxNotImprovingIterations, maxIterations);
 		Solution improved = ts.improve(start);
 		System.out.println("Cost: "+start.length()+", tour: "+(TSSolution)start);

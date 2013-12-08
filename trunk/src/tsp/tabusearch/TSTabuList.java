@@ -32,10 +32,14 @@ public class TSTabuList {
 	}
 	
 	public TSTabuList(AspirationCriteria criteria, int startTenure){
+		this.currentTenure = startTenure;
+		this.criteria = criteria;
+		initialize();
+	}
+	
+	public void initialize(){
 		tabus = new HashSet<TabuEdge>();
 		tabuList = new HashMap<Integer,HashSet<TabuEdge>>();
-		currentTenure = startTenure;
-		this.criteria = criteria;
 	}
 	
 	public void addTabu(Move m){	
