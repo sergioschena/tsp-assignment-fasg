@@ -1,8 +1,10 @@
 package tsp.tabusearch;
 
 import java.util.Collection;
+import java.util.Set;
 
 import tsp.model.City;
+import tsp.model.Edge;
 import tsp.model.Solution;
 
 
@@ -133,6 +135,12 @@ public class TSSolution implements Solution {
 	public Solution getSolutionFromCities(City[] cities){
 		return new TSSolution(cities);
 	}
+	@Override
+	public Set<Edge> getEdges() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 	
 	public City get(int index){
 		return cities[index];

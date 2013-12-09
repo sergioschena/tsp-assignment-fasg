@@ -1,4 +1,5 @@
 package tsp.model;
+import java.util.Set;
 
 public interface Solution extends Cloneable {
 	
@@ -21,5 +22,9 @@ public interface Solution extends Cloneable {
 	public void updateLength(int delta);
 	
 	public void setLength(int length);
+	
+	public Set<Edge> getEdges();
+	
+	//flip virtuali???
 	
 }

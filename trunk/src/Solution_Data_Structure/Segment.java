@@ -5,38 +5,28 @@ import java.util.*;
 import tsp.model.City;
 
 public class Segment {
-	private int reverse;
+	private static final int LAST = -1;
+	private boolean reverse;
 	private int size;
 	private int ID;
-	LinkedList<Client> client;
+	private Client first;
+	private Client last;
+	private Segment previous;
+	private Segment next;
 	
-	public Segment(int id, int size){
-		this.size=size;
+	
+	public Segment(int id){
 		this.ID=id;
-		this.client=new LinkedList<Client>();
-		this.reverse=1;
+		this.reverse=false;
+		this.size=0;
 	}
 	
-	void addClient(Client c){
-		this.client.add(c);
-	}
-	
-	// metodo che mi dice se la città è presente nel segmento
-	Client isCity(City c){
-		for(Client i:client){
-			if(i.getCity().getCity()==c.getCity()){
-				return i;
-			}
-		}
-		return null;
-	}
-
-	public int getReverse() {
+	public boolean getReverse() {
 		// TODO Auto-generated method stub
 		return reverse;
 	}
 
-	public void setReverse(int i) {
+	public void setReverse(boolean i) {
 		// TODO Auto-generated method stub
 		this.reverse=i;
 	}
@@ -46,6 +36,24 @@ public class Segment {
 		return this.ID;
 	}
 
+	public void addClient(City city, int k) {
+		// TODO Auto-generated method stub
+		if(k==0){
+			Client a=new Client(city,size);
+			this.first=a;
+			this.size++;
+		} else if(k==LAST){
+			Client a=new Client(city,size);
+			this.last=a;
+			this.size++;
+			} else {
+				Client a=new Client(city,size);
+			}
+			
+	}
+		
+
+	
 		
 
 	
