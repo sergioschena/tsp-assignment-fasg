@@ -2,8 +2,8 @@ package tsp.model;
 
 public interface InitialSolutionGenerator {
 	
-	public Solution generate();
+	public City[] generate();
 	
-	public Solution generate(int k);
+	public City[] generate(int k);
 	
 }
