@@ -12,17 +12,17 @@ public class Test_Vettore {
 	 */
 	public static void main(String[] args) {
 		
-		City cities[] = createCities10();
+		City cities[] = createCities76();
 		
 		CityManager manager = new CityManager(cities);
 		
 		LK_Intesifier intensifier = new LK_Intesifier(manager);
 		
-		intensifier.setParam(10, 15, 5, 5, 50);
+		intensifier.setParam(76, 15, 5, 5, 50);
 		
 		//TSSolution solution = new TSSolution(cities);
 		
-		Vettore solution=new Vettore(cities,manager);
+		Array_solution solution=new Array_solution(cities,manager);
 		
 		printDistances(manager);
 		
@@ -31,8 +31,8 @@ public class Test_Vettore {
 		long start = System.currentTimeMillis();
 		
 		//TSSolution best_sol = (TSSolution)intensifier.improve(solution);
-		//Vettore prova_clone= (Vettore) solution.clone();
-		Vettore best_sol= (Vettore)intensifier.improve(solution);
+		
+		Array_solution best_sol= (Array_solution)intensifier.improve(solution);
 		
 		long end = System.currentTimeMillis();
 		double secs = (end - start) / 1000.0;
