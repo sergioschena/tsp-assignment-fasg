@@ -12,12 +12,12 @@ public class NearestNeighbor implements InitialSolutionGenerator{
 	public NearestNeighbor(City[] cities){
 		this.cities=cities;
 		this.n=cities.length;
-		solution = new City[n];
 	}
 
-	@Override
-	public Solution generate() {
+	//@Override
+	public City[] generate() {
 		
+		City[] solution = new City[n];
 		int counter = 0;
 		boolean jump=false;
 		CityManager cm = new CityManager(cities);
@@ -29,6 +29,7 @@ public class NearestNeighbor implements InitialSolutionGenerator{
 			counter++;
 			City[] closer = cm.getNearest(c); 
 			jump=false;
+			//TODO ottimizz: mettere nel vettore solo quelle non visitate 
 			//leggo il vettore delle citta piu vicine e scelgo la prima non visitata come prossima citta da visitare
 			for(int i=0; i<closer.length && jump==false; i++){
 				if (closer[i].visited == false){
@@ -41,14 +42,14 @@ public class NearestNeighbor implements InitialSolutionGenerator{
 		}
 		
 		
-		return null; //TODO deve return Solution (Clonable) ???
+		return solution; //TODO deve return Clonable ???
 	}
 
-	@Override
-	public Solution generate(int k) {
+	//@Override
+	public City[] generate(int k) {
 		
+		City[] solution = new City[n];
 		int counter = 0;
-		boolean jump=false;
 		CityManager cm = new CityManager(cities);
 		City c = cities[0]; //inizio dalla prima citta'
 		c.visit(true);
@@ -76,7 +77,7 @@ public class NearestNeighbor implements InitialSolutionGenerator{
 			c=kcloser[r];
 		}
 		
-		return null; //ritornare Solution (Clonable)
+		return solution; //ritornare Solution
 	}
 
 }

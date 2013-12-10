@@ -11,12 +11,66 @@ public class Istance {
 	public String fileName;
 	public int N; //number of nodes
 	public LinkedList<City> cities_ll = new LinkedList<City>();
-	public City[] cities_arr; //?
+	public City[] cities_arr; //serve?
 	
 	
-	public Istance(String fileName) throws IOException{ 
+	public Istance(String fileName){ 
 		
 		this.fileName = fileName;
+		
+		//Perboli's lettura file istanze:
+		try
+		{
+			File input = new File(fileName);
+			BufferedReader br = new BufferedReader(	new InputStreamReader(new FileInputStream(input)));
+			String line;
+			String token;
+			line = br.readLine();	
+			line = br.readLine();	
+			line = br.readLine();	
+			line = br.readLine();
+			StringTokenizer st = new StringTokenizer(line);	
+			token = st.nextToken();
+			token = st.nextToken();		
+			this.N = Integer.parseInt(token); 
+	        //customers = new double[numCustomers][2];
+			line = br.readLine();
+			line = br.readLine();
+	        for( int i = 0; i < this.N; i++ )
+	        {
+				line = br.readLine();        	
+				st = new StringTokenizer(line);	
+				token = st.nextToken();
+				int n = Integer.parseInt(token); 
+				token = st.nextToken();
+				double x = Double.parseDouble(token);
+				//customers[i][0] = Double.parseDouble(token); 
+				token = st.nextToken();
+				double y = Double.parseDouble(token);
+				//customers[i][1] = Double.parseDouble(token); 
+				City c = new City(n, x, y);
+		    	cities_ll.add(c);
+				
+	        }
+			line = br.readLine();						
+			if (!line.toUpperCase().contains("EOF"))
+			{
+				throw new IllegalArgumentException("Error while reading the input file: EOF Section");
+			}
+
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			System.out.println("Error "+e.getMessage());
+	        System.exit(-1);
+		}
+		
+	}
+		
+	
+		
+	/*	//mio :
+	
 		FileReader f;
 	    f=new FileReader(fileName);
 		BufferedReader b;
@@ -31,7 +85,7 @@ public class Istance {
     	int n = Integer.parseInt(st.toString());
     	this.N=n;
     	b.close();
-	}
+	} */
 	
 	public String getFileName(){
 		return fileName;
@@ -41,7 +95,15 @@ public class Istance {
 		return N;
 	}
 	
-	public City[] IstanceGenerator() throws IOException{ //TODO: riceve il file name?
+	public LinkedList<City> getCitiesLL(){
+		return cities_ll;
+	}
+	
+	public City[] getCitiesArr(){
+		return (City[]) cities_ll.toArray();
+	}
+	
+	/*public City[] IstanceGenerator() throws IOException{ 
 		
 		FileReader f;
 	    f=new FileReader(this.fileName);
@@ -73,6 +135,6 @@ public class Istance {
 	    cities_arr = (City[]) cities_ll.toArray();
 	    return cities_arr;
 			
-	}
+	}*/
 
 }
