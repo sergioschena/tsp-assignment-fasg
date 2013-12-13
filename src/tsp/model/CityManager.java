@@ -142,6 +142,11 @@ public class CityManager {
 		return bestNear.toArray(new City[0]);
 	}
 	
+	public void clearVisited(){
+		for(City c : cities)
+			c.visited = false;
+	}
+	
 	private class CityComparator implements Comparator<City>{
 		int src;
 		

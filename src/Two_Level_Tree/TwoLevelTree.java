@@ -142,8 +142,8 @@ public class TwoLevelTree implements Solution {
 		}
 		
 		//bisogna collegare l'ultima città e l'ultimo segmento con i propri successivi
-		clients[last_client_index].next = clients[0];
-		clients[0].prev = clients[last_client_index];
+		clients[last_client_index].next = segments[0].first;
+		segments[0].first.prev = clients[last_client_index];
 		
 		segments[segments.length-1].next = segments[0];
 		segments[0].prev = segments[segments.length-1];

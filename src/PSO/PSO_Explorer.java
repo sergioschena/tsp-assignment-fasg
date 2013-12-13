@@ -110,6 +110,7 @@ public class PSO_Explorer implements Explorer {
 			for(Particle p : particles)
 				improve(p);
 			
+			i++;
 		}
 		
 		return global_best_particle.position;
