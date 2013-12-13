@@ -30,9 +30,6 @@ public class LK_Intesifier implements Intensifier {
 	// array di città da collegare
 	private City cities[];
 	
-	
-	//TODO gestire la creazione degli archi e delle loro lunghezze
-	
 	// gestore delle città
 	private CityManager city_manager;
 	
@@ -42,6 +39,9 @@ public class LK_Intesifier implements Intensifier {
 	
 	// set degli archi aggiunti
 	private HashSet<Edge> added_Edges;
+	
+	//numero di scambi effettuati per ottenere l'ultima soluzione migliore
+	private int k;
 	
 	//insieme degli archi x
 	private Edge[] x_Edges;
@@ -55,7 +55,7 @@ public class LK_Intesifier implements Intensifier {
 	//flag della direzione
 	// true:  scorrimento dal primo elemento della soluzione all'ultimo      
 	// false: scorrimento inverso
-	private boolean direction = true;
+	private boolean direction;
 	
 //------------------------------------------------------------------------------------------
 // Parametri
@@ -110,13 +110,17 @@ public class LK_Intesifier implements Intensifier {
 		
 		//la soluzione da migliorare è quella iniziale e la migliore fino ad ora
 		best_solution = (Solution)start.clone();
-		
+			
 		int n = city_number<max_t1 ? city_number : max_t1;
+		
+		//Per rendere differente ogni fase di miglioramento, si inizia da una città
+		//causale come prima città iniziale
+		int first_city_index = (int) (Math.random() * (double)city_number);
 		
 		//ricerca iterando sulle città da prendere come città iniziale del tour
 		for(int i = 0; i < n; i++){
-			
-			// TODO le inizializzazioni dovrebbero essere fatte ogni volta che si trova
+					
+			// 	 	le inizializzazioni dovrebbero essere fatte ogni volta che si trova
 			//      una nuova soluzione migliore globale oppure non si è torvata alcun
 			//      guadagno partendo dalla città i-esima
 			
@@ -124,6 +128,9 @@ public class LK_Intesifier implements Intensifier {
 
 			//il guadagno iniziale è 0
 			best_gain = 0;
+			
+			//numero di archi scambiati azzerato
+			k = 0;
 			
 			//TODO valutare se eseguire un clear() sugli ArrayList è più veloce di
 			//ricostruirli
@@ -138,9 +145,11 @@ public class LK_Intesifier implements Intensifier {
 			gains = new int[city_number];
 			
 			//nuova città iniziale
-			t1_current = cities[i];
+			t1_current = cities[first_city_index];
 			
-			find_improvement(cities[i]);
+			find_improvement(cities[first_city_index]);
+			
+			first_city_index = (first_city_index +1)%city_number;
 		}
 		
 		return best_solution;
@@ -174,8 +183,6 @@ public class LK_Intesifier implements Intensifier {
 			// se non esistono archi candidati ad essere y1 cambia x1
 			if(y1s == null){
 				//backtracking: elimina x1 dal gruppo di archi x
-				//TODO valutare di aggiungere x1 solo dopo questo controllo
-				//FIXME x_Edges.remove(0);
 				continue;
 			}
 			
@@ -202,8 +209,8 @@ public class LK_Intesifier implements Intensifier {
 				City t3 = y1.getDepart();
 				
 				//ricerca su i due archi x2 possibili
-				for(int k = 0; k<2; k++){
-					if(k == 0){
+				for(int m = 0; m<2; m++){
+					if(m == 0){
 						//risultato accettabile (feasible) la scelta di x2 rende il tour
 						//hamiltoniano
 						
@@ -235,6 +242,9 @@ public class LK_Intesifier implements Intensifier {
 							//aggiorna il guadagno migliore trovato
 							best_gain = G2_star;
 							
+							//aggiorna il numero di archi scambati
+							k = 2;
+							
 							//non c'è bisogno di fare backtrack
 							backtrack = false;
 						}
@@ -253,9 +263,7 @@ public class LK_Intesifier implements Intensifier {
 								
 								// backtracking
 								current_solution = (Solution)best_solution.clone();
-							
-								//TODO valutare di aggiungere x2 solo dopo questo controllo
-								//FIXME x_Edges.remove(1);
+								
 								continue;
 							}
 							else{
@@ -346,6 +354,9 @@ public class LK_Intesifier implements Intensifier {
 									//aggiorna il guadagno migliore trovato
 									best_gain = Gi_star;
 									
+									//aggiorna il numero di archi scambati
+									k = i;
+									
 									//non c'è bisogno di fare backtrack
 									backtrack = false;
 								}
@@ -367,7 +378,7 @@ public class LK_Intesifier implements Intensifier {
 									//guadagno parziale Gi
 									Gi = yi_pair.part_gain;
 									
-									// TODO registrazione di yi e gi
+									//registrazione di yi e gi
 									y_Edges[i-1] = yi;
 									added_Edges.add(yi);
 									
@@ -383,9 +394,10 @@ public class LK_Intesifier implements Intensifier {
 							if(!backtrack)
 								break;
 							
-							//TODO backtrack per riportare il sistema alla soluzione iniziale
-							//	   dovrebbe bastare copiare la soluzione iniziale a quella
-							//	   corrente e svuotare la lista di archi aggiunti
+							//backtrack per riportare il sistema alla soluzione iniziale
+							//dovrebbe bastare copiare la soluzione iniziale a quella
+							//corrente e svuotare la lista di archi aggiunti e poi effettuare
+							//lo scambio tra x1 e y1
 							
 							current_solution = (Solution)best_solution.clone();
 							
@@ -460,7 +472,6 @@ public class LK_Intesifier implements Intensifier {
 							
 							// in base alla posizione di t5 si può decidere come
 							// ricostruire il tour
-							//TODO verificare la correttezza del between quando t2 = t3 
 							if(between(current_solution, t2, t5, t3)){
 								//prendendo un qualsiasi arco x con estremo t5 si
 								//ritorna a un tour accettabile
@@ -513,6 +524,9 @@ public class LK_Intesifier implements Intensifier {
 											
 										//aggiorna il guadagno migliore trovato
 										best_gain = G3_star;
+										
+										//aggiorna il numero di archi scambati
+										k = 3;
 											
 										//non c'è bisogno di fare backtrack
 										backtrack = false;
@@ -565,6 +579,9 @@ public class LK_Intesifier implements Intensifier {
 										//arco xi
 										xi = createEdge(t_2im1, t2i);
 										
+										//registra xi
+										x_Edges[i-1] = xi;
+										
 										//flip per sostituire xi e yi-1* con yi e yi*
 										flip(current_solution, t_2im1, t_2im2);
 											
@@ -585,6 +602,9 @@ public class LK_Intesifier implements Intensifier {
 												
 											//aggiorna il guadagno migliore trovato
 											best_gain = Gi_star;
+											
+											//aggiorna il numero di archi scambati
+											k = i;
 												
 											//non c'è bisogno di fare backtrack
 											backtrack = false;
@@ -754,6 +774,9 @@ public class LK_Intesifier implements Intensifier {
 										
 									//aggiorna il guadagno migliore trovato
 									best_gain = G4_star;
+									
+									//aggiorna il numero di archi scambati
+									k = 4;
 										
 									//non c'è bisogno di fare backtrack
 									backtrack = false;
@@ -792,9 +815,6 @@ public class LK_Intesifier implements Intensifier {
 								//migliora il guadagno?
 								while(yi!=null && Gi>best_gain && i < max_lambda
 																	&& i < city_number){
-									//TODO ottenere gi e registrarlo con gli archi
-										
-										
 									i++;
 										
 									//città t2i-2
@@ -833,6 +853,9 @@ public class LK_Intesifier implements Intensifier {
 											
 										//aggiorna il guadagno migliore trovato
 										best_gain = Gi_star;
+										
+										//aggiorna il numero di archi scambati
+										k = i;
 											
 										//non c'è bisogno di fare backtrack
 										backtrack = false;
@@ -1046,10 +1069,6 @@ public class LK_Intesifier implements Intensifier {
 			//arco x3 da rompere successivamente
 			Edge x3 = createEdge(t5, t6);
 			
-			//TODO aggiustare sistema di set di archi aggiunti e eliminati
-			
-			//FIXME questo controllo potrebbe dover essere modificato una volta stabilito
-			//		come verificare che un arco è tra quelli aggiunti
 			if(added_Edges.contains(x3)){
 				//y2 non può essere scelto in quanto provocherebbe la rottura di un arco
 				//aggiunto precedentemente
@@ -1407,7 +1426,6 @@ public class LK_Intesifier implements Intensifier {
 				//yi non può essere candidato dato che porterebbe a rompere un arco y
 				continue;
 			}
-			
 			//ottimalità oi
 			int oi = x_ip1.getLength() - yi.getLength();
 			
@@ -1446,12 +1464,16 @@ public class LK_Intesifier implements Intensifier {
 		return s.previous(c);
 	}
 	
+//------------------------------------------------------------------------------------------
+	
 	// città precedente nella soluzione
 	private City prev(Solution s, City c){
 		if(direction)
 			return s.previous(c);
 		return s.next(c);
 	}
+	
+//------------------------------------------------------------------------------------------
 	
 	// città in mezzo ad altre due
 	private boolean between(Solution s, City a, City b, City c){
@@ -1460,6 +1482,8 @@ public class LK_Intesifier implements Intensifier {
 			return s.between(a, b, c);
 		return s.between(c, b, a);
 	}
+	
+//------------------------------------------------------------------------------------------
 	
 	// scambio di due archi
 	private void flip(Solution s, City a, City b){
@@ -1477,11 +1501,11 @@ public class LK_Intesifier implements Intensifier {
 		s.flip(c1, c2);
 	}
 	
-	// la creazione di un arco è dipendente dalla direzione
+//------------------------------------------------------------------------------------------
+	
+	//estrazione di un arco dal gestore delle città
 	private Edge createEdge(City c1, City c2){
-		//if(direction)
-			return city_manager.getEdge(c1, c2);
-		//return city_manager.getEdge(c2, c1);
+		return city_manager.getEdge(c1, c2);
 	}
 	
 //------------------------------------------------------------------------------------------
@@ -1504,6 +1528,8 @@ public class LK_Intesifier implements Intensifier {
 		
 	}
 	
+//------------------------------------------------------------------------------------------
+	
 	//classe per l'ordinamento di un EdgeGain_Pair in base al guadagno gi di un arco y
 	private class EdgePairComparator implements Comparator<EdgeGain_Pair> {
 
@@ -1515,6 +1541,8 @@ public class LK_Intesifier implements Intensifier {
 		}
 		
 	}
+	
+//------------------------------------------------------------------------------------------
 	
 	//classe utilizzata per memorizzare quale città t8 viene scelta nel caso di scambio
 	//di 4 archi per rendere il tour hamiltoniano

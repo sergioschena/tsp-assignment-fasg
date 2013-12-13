@@ -43,19 +43,25 @@ class Particle implements Cloneable {
 		initVelocity();
 		
 		//il primo migliore locale è la particella stessa
-		local_best_particle = (Particle) clone();
+		updateLocalBest();
 				
 	}
 	
 	//metodo per aggiornare gli archi secondo la posizione attuale
 	public void updateEdges(){
 		
-		//FIXME bisognerebbe creare un punto di accesso alle città della soluzione
+		edge_set = (HashSet<Edge>) position.getEdges();
+		
+		edges = (Edge[]) edge_set.toArray();
+		
+		/* vecchia implementazione
 		City c0 = manager.getCities()[0];
 				
 		int n = manager.n;
 		
 		edges = new Edge[n];
+		
+		
 		
 		edge_set = new HashSet<Edge>();
 		
@@ -82,6 +88,7 @@ class Particle implements Cloneable {
 		edges[n-1] = edge;
 		
 		edge_set.add(edge);
+		*/
 	}
 	
 	//metodo che inizializza la velocità in maniera randomica
@@ -130,21 +137,48 @@ class Particle implements Cloneable {
 		return local_best_particle.position.length();
 	}
 
+	@SuppressWarnings("unchecked")
 	public Object clone() {
 		try {
-			//FIXME
+			
 			Particle p = (Particle) super.clone();
 			p.position = (Solution)position.clone();
 			p.velocity = velocity.clone();
+			p.edges = edges.clone();
+			p.edge_set = (HashSet<Edge>) edge_set.clone();
+			p.manager = manager;
 			
-			//FIXME loop di clone?
-			p.local_best_particle = (Particle) local_best_particle.clone();
+			p.local_best_particle = new Particle(local_best_particle.position, manager);
+			p.local_best_particle.velocity = local_best_particle.velocity.clone();
 			return p;
 			
 		} catch (CloneNotSupportedException e) {
 			e.printStackTrace();
 			return null;
 		}
+	}
+	
+	//metodo per aggiornare la soluzione locale migliore con i dati correnti
+	@SuppressWarnings("unchecked")
+	public void updateLocalBest(){
+		Particle local;
+		try {
+			
+			local = (Particle) super.clone();
+			local.position = (Solution)position.clone();
+			local.velocity = velocity.clone();
+			local.edges = edges.clone();
+			local.edge_set = (HashSet<Edge>) edge_set.clone();
+			local.manager = manager;
+			
+			local.local_best_particle = null;
+			
+			local_best_particle = local;
+			
+		} catch (CloneNotSupportedException e) {
+			e.printStackTrace();
+		}
+		
 	}
 	
 	//metodo che aggiorna la posizione e la velocità della particella
