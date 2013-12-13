@@ -1,5 +1,6 @@
 package LK;
 
+import Two_Level_Tree.TwoLevelTree;
 import tsp.model.*;
 import tsp.tabusearch.TSSolution;
 
@@ -16,9 +17,11 @@ public class Test_LK {
 		
 		LK_Intesifier intensifier = new LK_Intesifier(manager);
 		
-		intensifier.setParam(76, 15, 5, 5, 50);
+		intensifier.setParam(76, 15, 5, 15, 50);
 		
 		TSSolution solution = new TSSolution(cities);
+		
+		//TwoLevelTree solution = new TwoLevelTree(manager, cities, 9);
 		
 		printDistances(manager);
 		
@@ -27,6 +30,8 @@ public class Test_LK {
 		long start = System.currentTimeMillis();
 		
 		TSSolution best_sol = (TSSolution)intensifier.improve(solution);
+		
+		//TwoLevelTree best_sol = (TwoLevelTree)intensifier.improve(solution);
 		
 		long end = System.currentTimeMillis();
 		double secs = (end - start) / 1000.0;
