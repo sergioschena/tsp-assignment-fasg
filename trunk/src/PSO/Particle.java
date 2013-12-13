@@ -52,7 +52,7 @@ class Particle implements Cloneable {
 		
 		edge_set = (HashSet<Edge>) position.getEdges();
 		
-		edges = (Edge[]) edge_set.toArray();
+		edges = edge_set.toArray(new Edge[]{});
 		
 		/* vecchia implementazione
 		City c0 = manager.getCities()[0];
@@ -226,7 +226,7 @@ class Particle implements Cloneable {
 		
 		//assegna la nuova velocità
 		//FIXME evitare il toArray()?
-		velocity = (PSO_Edge[]) new_velocity.toArray();
+		velocity = new_velocity.toArray(new PSO_Edge[]{});
 		
 		//FIXME l'ordinamento viene eseguito per ogni particella, conviene?
 		//Bisogna ordinare rispetto alla probabilità bisogna
@@ -252,7 +252,7 @@ class Particle implements Cloneable {
 			edges.add(new PSO_Edge(prob, e));
 		}
 		
-		return (PSO_Edge[]) edges.toArray();
+		return edges.toArray(new PSO_Edge[]{});
 	}
 	
 	//metodo per controllare se un arco fa parte della posizione della particella
@@ -360,9 +360,15 @@ class Particle implements Cloneable {
 		//set di città non ancora visitate
 		HashSet<City> cities_0_times = new HashSet<City>();
 		
+		//azzeramento del flag visited delle città, il flag viene messo a true quando la città
+		//è visitata due volte
+		
+		//TODO se si vuole utilizzare questo metodo bisogna usare il metodo bestCurrentNearestof
+		//	   della classe CityManager. l'utilizzo del metodo degrada le prestazioni
+		//manager.clearVisited();
+		
 		//riempimento del set di città non ancora visitate
-		for(City c : manager.getCities())
-			cities_0_times.add(c);
+		cities_0_times.addAll(Arrays.asList(manager.getCities()));
 		
 		//contatore degli archi inseriti, una volta raggiunto n, significa che si ha un tour
 		//completo
@@ -484,23 +490,23 @@ class Particle implements Cloneable {
 		City depart = e.getDepart();
 		
 		if(set_c2.contains(depart))
-			//la città è già presente 2 volte nella velocità
+			//la città è già presente 2 volte nella posizione
 			return false;
 
-		//la città di partenza è presente nella nuova velocità?
-		boolean depart_is_present = set_c0.contains(depart);
+		//la città di partenza è presente nella nuova posizione?
+		boolean depart_is_present = !set_c0.contains(depart);
 		
 		//città di arrivo
 		City arrive = e.getArrive();
 
 		if(set_c2.contains(arrive))
-			//la città è già presente 2 volte nella velocità
+			//la città è già presente 2 volte nella posizione
 			return false;
 
-		//la città di partenza è presente nella nuova velocità?
-		boolean arrive_is_present = set_c0.contains(arrive);
+		//la città di partenza è presente nella nuova posizione?
+		boolean arrive_is_present = !set_c0.contains(arrive);
 		
-		//4 casi:	-città di partenza e di arrivo sono entrambi assenti dalla velocità,  
+		//4 casi:	-città di partenza e di arrivo sono entrambi assenti dalla posizione,  
 		//			 quindi diventeranno due nuovi estremi
 		//			-una tra le due città è già un estremo, mentre l'altra è assente, quindi
 		//			 quest'ultima sostituirà la prima come estremo
@@ -515,7 +521,7 @@ class Particle implements Cloneable {
 			if(map_c1.get(depart).equals(arrive) && map_c1.get(arrive).equals(depart)){
 				//quarto caso, bisogna controllare che questo sia l'ultimo arco da inserire
 				
-				if(i != n)
+				if(i != n-1)
 					//non è l'ultimo arco da inserire, quindi è da scartare
 					return false;
 			}
@@ -539,6 +545,10 @@ class Particle implements Cloneable {
 			//e sono da aggiungere al set successivo
 			set_c2.add(depart);
 			set_c2.add(arrive);
+			
+			//le città sono visitate
+			depart.visited = true;
+			arrive.visited = true;
 			
 			//bisogna aggiungere l'arco nella mappa
 			map.get(depart).add(e);
@@ -589,8 +599,9 @@ class Particle implements Cloneable {
 				map_c1.put(new_bound, other_bound);
 				map_c1.put(other_bound, new_bound);
 				
-				//il vecchio estremo passa al set successivo
+				//il vecchio estremo passa al set successivo, e diviene visitata
 				set_c2.add(old_bound);
+				old_bound.visited = true;
 				//il nuovo estremo deve essere rimosso dal set precedente
 				set_c0.remove(new_bound);
 				
@@ -617,8 +628,10 @@ class Particle implements Cloneable {
 		
 		int n = i;
 		
+		ArrayList<City> key_list = new ArrayList<City>(set_c0);
+		
 		//inserimento delle non ancora visitate
-		Iterator<City> iter = set_c0.iterator();
+		Iterator<City> iter = key_list.iterator();
 		
 		//ripeti finchè non sono stati aggiunti tutti gli n archi
 		//oppure non sono finite le città
@@ -653,7 +666,8 @@ class Particle implements Cloneable {
 		//fine ricerca tra le città non ancora visitate
 		
 		//inserimento delle città visitate una sola volta
-		iter = map_c1.keySet().iterator();
+		key_list = new ArrayList<City>(map_c1.keySet());
+		iter = key_list.iterator();
 		
 		//ricerca un nuovo arco finchè non ne sono stati aggiunti n
 		//teoricamente una volta trovati n archi, tutte le città dovrebbero trovarsi nel
