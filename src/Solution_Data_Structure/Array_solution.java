@@ -78,23 +78,20 @@ public class Array_solution implements Solution{
 	@Override
 	public void flip(City a, City b) {
 		// TODO Auto-generated method stub
-		
+
 		int pa=position[a.getCity()-1];
 		int pb=position[b.getCity()-1];
 		int nexta=position[next(a).getCity()-1];
-		//int[] pos=position.clone();
 		
-		if(pa==pb) { return; }
+	
 		
-		
-		if(pa>pb) {flip(b,a);
-				   return; }
+		if(nexta==pb){return;}
 		
 		// aggiungo i nuovi archi e modifico il costo
 			Edge old_1=getEdge(a,next(a));
 			
 			Edge old_2=getEdge(b,next(b));
-			
+						
 			int cost_1=manager.cost(a, b);
 			int cost_2=manager.cost(next(a),next(b));
 			Edge new_1= new Edge(a,b, cost_1);
@@ -107,32 +104,24 @@ public class Array_solution implements Solution{
 		
 			cost=cost-old_1.getLength()-old_2.getLength()+cost_1+cost_2;
 		 
-
-		
-		//pos[b.getCity()-1]=pos[next(a).getCity()-1];
-		cities[pb]=next(a);
-		
-		//pos[next(a).getCity()-1]=pb;
-		cities[pa+1]=b;
 			
+			int cnt = (nexta<pb ? pb-nexta-1: size+pb-nexta-1)/2; 
+			for(; cnt >= 0; cnt--){
+				swap(nexta,pb);
+				nexta = (nexta+1)%size;
+				pb = (size+pb-1)%size;
+			}
 		
-		int i=pa+2;
-		int k=pb-1;
-		
-		
-		while(i!=k && i<k){
-			swap(cities[i],cities[k]);
-			i++;
-			k--;
-		}
-		
-		//position=pos;
-		for(int j=nexta; j<(pb+1); j++){
-			position[cities[j].getCity()-1]=j;
-		}
-		
-				
+				aggiornaPosizione();
+						
 		return;
+	}
+
+	private void aggiornaPosizione() {
+		// TODO Auto-generated method stub
+		for(int i=0; i<size; i++){
+			position[cities[i].getCity()-1]=i;
+		}
 	}
 
 	private Edge getEdge(City a, City next) {
@@ -145,13 +134,11 @@ public class Array_solution implements Solution{
 		return null;
 	}
 
-	private void swap(City city, City city2) {
+	private void swap(int city,int city2) {
 		// TODO Auto-generated method stub
-		int pc=position[city.getCity()-1];
-		int pc2=position[city2.getCity()-1];
-		
-		cities[pc]=city2;
-		cities[pc2]=city;
+		City tmp=cities[city];		
+		cities[city]=cities[city2];
+		cities[city2]=tmp;
 		//position[pc]=pc2;
 		//position[pc2]=pc;
 	}
@@ -170,8 +157,8 @@ public class Array_solution implements Solution{
 	public Object clone(){
 		try {
 			Array_solution cl = (Array_solution) super.clone();
-			cl.cities = cities.clone();
-			cl.position=position.clone();
+			cl.cities = this.cities.clone();
+			cl.position=this.position.clone();
 			cl.edges=(HashSet<Edge>)edges.clone();
 			return cl;
 		} catch (CloneNotSupportedException e) {

@@ -78,7 +78,9 @@ public class TSSolution implements Solution {
 			swap(src,dst);
 			src = (src+1)%size;
 			dst = (size+dst-1)%size;
-		}		
+		}
+		
+		
 	}
 	
 	private int pos(City c){
