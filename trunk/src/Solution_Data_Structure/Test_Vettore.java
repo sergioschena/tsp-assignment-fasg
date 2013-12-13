@@ -18,7 +18,7 @@ public class Test_Vettore {
 		
 		LK_Intesifier intensifier = new LK_Intesifier(manager);
 		
-		intensifier.setParam(76, 15, 5, 5, 50);
+		intensifier.setParam(10, 15, 5, 5, 50);
 		
 		//TSSolution solution = new TSSolution(cities);
 		
@@ -26,7 +26,8 @@ public class Test_Vettore {
 		
 		printDistances(manager);
 		
-		System.out.println(solution + " -> " + evaluate(solution, manager, cities[0]));
+		System.out.println(solution + " -> " +solution.length());
+		System.out.println(evaluate(solution,manager,cities[0]));
 		
 		long start = System.currentTimeMillis();
 		
@@ -39,9 +40,8 @@ public class Test_Vettore {
 		
 		System.out.println("Time = "+secs);
 		
-		System.out.println(best_sol + " -> " + evaluate(best_sol, manager, cities[0]));
-		
-		System.out.println(evaluate(best_sol, manager, cities[0]));
+		System.out.println(best_sol + " -> " + best_sol.length());
+		System.out.println(evaluate(best_sol,manager,cities[0]));
 	}
 	
 	public static City[] createCities10(){
