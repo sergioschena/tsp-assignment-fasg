@@ -18,7 +18,7 @@ public class Test_Vettore {
 		
 		LK_Intesifier intensifier = new LK_Intesifier(manager);
 		
-		intensifier.setParam(10, 15, 5, 5, 50);
+		intensifier.setParam(20, 15, 5, 15, 76);
 		
 		//TSSolution solution = new TSSolution(cities);
 		
