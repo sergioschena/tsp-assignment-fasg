@@ -38,7 +38,7 @@ public class Test_PSO {
 		
 		LK_Intesifier dummy = new LK_Intesifier(manager);
 		
-		dummy.setParam(20, 15, 5, 15, 750);
+		dummy.setParam(100, 15, 5, 15, 750);
 		
 		System.out.println("Start solution constuction\n");
 		
@@ -50,7 +50,8 @@ public class Test_PSO {
 		
 		PSO_Explorer explorer = new PSO_Explorer(manager, generator, dummy, 120, solution_type);
 		
-		explorer.configExplorer(0.5, 1.4, 2, 2, 10);
+		//tempo massimo: 1h
+		explorer.configExplorer(0.5, 1.4, 2, 2, 100, 3600000);
 		
 		System.out.println("Start explore\n");
 		

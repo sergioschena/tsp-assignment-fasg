@@ -53,7 +53,8 @@ public class Array_solution implements Solution{
 	public City previous(City c) {
 		// TODO Auto-generated method stub
 		int a=position[c.getCity()-1];
-		if(a==0){ return cities[size-1];}
+		a--;
+		if(a<0){ return cities[size-1];}
 		return cities[a];
 	}
 
@@ -78,31 +79,32 @@ public class Array_solution implements Solution{
 	@Override
 	public void flip(City a, City b) {
 		// TODO Auto-generated method stub
+		
+		City next_a = next(a);
+		City next_b = next(b);
 
 		int pa=position[a.getCity()-1];
 		int pb=position[b.getCity()-1];
-		int nexta=position[next(a).getCity()-1];
-		
-	
+		int nexta=position[next_a.getCity()-1];
 		
 		if(nexta==pb){return;}
 		
-		// aggiungo i nuovi archi e modifico il costo
-			Edge old_1=getEdge(a,next(a));
+			// aggiungo i nuovi archi e modifico il costo
+			Edge old_1=manager.getEdge(a,next_a);
 			
-			Edge old_2=getEdge(b,next(b));
+			Edge old_2=manager.getEdge(b,next_b);
 						
-			int cost_1=manager.cost(a, b);
-			int cost_2=manager.cost(next(a),next(b));
-			Edge new_1= new Edge(a,b, cost_1);
-			Edge new_2=new Edge(next(a),next(b),cost_2);
+			//int cost_1=manager.cost(a, b);
+			//int cost_2=manager.cost(next(a),next(b));
+			Edge new_1= manager.getEdge(a,b);
+			Edge new_2=manager.getEdge(next_a,next_b);
 		
 			edges.remove(old_1);
 			edges.remove(old_2);
 			edges.add(new_1);
 			edges.add(new_2);
 		
-			cost=cost-old_1.getLength()-old_2.getLength()+cost_1+cost_2;
+			cost=cost-old_1.getLength()-old_2.getLength()+new_1.getLength()+new_2.getLength();
 		 
 			
 			int cnt = (nexta<pb ? pb-nexta-1: size+pb-nexta-1)/2; 
@@ -111,12 +113,14 @@ public class Array_solution implements Solution{
 				nexta = (nexta+1)%size;
 				pb = (size+pb-1)%size;
 			}
-		
-				aggiornaPosizione();
+				
+			//chiamata inutile, swap dovrebbe aggiornare anche la posizione delle città
+			//aggiornaPosizione();
 						
 		return;
 	}
 
+	//metodo inutile, basta swap a eseguire lo scambio nel vettore di posizione e delle città
 	private void aggiornaPosizione() {
 		// TODO Auto-generated method stub
 		for(int i=0; i<size; i++){
@@ -124,6 +128,9 @@ public class Array_solution implements Solution{
 		}
 	}
 
+	//metodo inutile, esiste già quello di CityManager
+	//non importa che l'arco sia lo stesso oggetto, basta che le città agli estremi siano le
+	//stesse
 	private Edge getEdge(City a, City next) {
 		// TODO Auto-generated method stub
 		for(Edge e:edges){
@@ -134,11 +141,16 @@ public class Array_solution implements Solution{
 		return null;
 	}
 
-	private void swap(int city,int city2) {
+	private void swap(int next_a,int pb) {
 		// TODO Auto-generated method stub
-		City tmp=cities[city];		
-		cities[city]=cities[city2];
-		cities[city2]=tmp;
+		City c_next_a=cities[next_a];
+		City c_b = cities[pb];
+		
+		cities[next_a]=c_b;
+		cities[pb]=c_next_a;
+		
+		position[c_b.city-1] = next_a;
+		position[c_next_a.city-1] = pb;
 		//position[pc]=pc2;
 		//position[pc2]=pc;
 	}
@@ -160,6 +172,9 @@ public class Array_solution implements Solution{
 			cl.cities = this.cities.clone();
 			cl.position=this.position.clone();
 			cl.edges=(HashSet<Edge>)edges.clone();
+			cl.size = size;
+			cl.cost = cost;
+			cl.manager = manager;
 			return cl;
 		} catch (CloneNotSupportedException e) {
 			e.printStackTrace();
@@ -176,9 +191,15 @@ public class Array_solution implements Solution{
 
 	@Override
 	public Solution getSolutionFromCities(City[] cities) {
+		//Mai creare un CityManager, ogni volta che se ne crea uno, viene ricalcolata la
+		//matrice delle distanze
+		return new Array_solution(cities,manager);
+	}
+	
+	@Override
+	public Set<Edge> getEdges() {
 		// TODO Auto-generated method stub
-		CityManager c=new CityManager(cities);
-		return new Array_solution(cities,c);
+		return this.edges;
 	}
 
 	@Override
@@ -199,10 +220,6 @@ public class Array_solution implements Solution{
 		
 	}
 
-	@Override
-	public Set<Edge> getEdges() {
-		// TODO Auto-generated method stub
-		return this.edges;
-	}
+	
 
 }

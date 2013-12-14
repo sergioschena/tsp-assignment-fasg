@@ -30,6 +30,9 @@ public class PSO_Explorer implements Explorer {
 	//numero massimo di iterazioni
 	private int max_iter = 10;
 	
+	//tempo massimo di esplorazione in ms (default: 3min = )
+	private long max_exploring_time = 18000;
+	
 	//numero di particelle
 	private int num_particles = 20;
 	
@@ -79,12 +82,14 @@ public class PSO_Explorer implements Explorer {
 	}
 	
 	//metodo per configurare i parametri dell'algoritmo
-	public void configExplorer(double w, double c1, double c2, double c3, int max_iter){
+	public void configExplorer(double w, double c1, double c2, double c3, int max_iter, 
+																				long max_time){
 		this.weight = w;
 		this.c1 = c1;
 		this.c2 = c2;
 		this.c3 = c3;
 		this.max_iter = max_iter;
+		this.max_exploring_time = max_time;
 	}
 	
 //------------------------------------------------------------------------------------------
@@ -99,8 +104,14 @@ public class PSO_Explorer implements Explorer {
 		for(Particle p : particles)
 			improve(p);
 		
+		long start_time = System.currentTimeMillis();
+		
+		long exploring_time = 0;
+		
 		//FIXME altri criteri di terminazione?
-		while(i < max_iter){
+		//FIXME il criterio temporale dovrebbe tenere in conto il tempo medio per una
+		//		iterazione: se manca un ms, ma un'iterazione ci mette 1 min si è fuori tempo
+		while(i < max_iter && exploring_time < max_exploring_time){
 			
 			//aggiorna la velocità e la posizione delle particelle
 			for(Particle p : particles)
@@ -111,6 +122,8 @@ public class PSO_Explorer implements Explorer {
 				improve(p);
 			
 			i++;
+			
+			exploring_time = System.currentTimeMillis() - start_time;
 		}
 		
 		return global_best_particle.position;
