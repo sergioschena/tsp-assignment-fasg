@@ -11,13 +11,13 @@ public class TwoLevelTree implements Solution {
 // Attributi
 //---------------------------------------------------------------------------------------
 	
-	//città del problema
+	//cittï¿½ del problema
 	City[] cities;
 	
-	//gestore delle città
+	//gestore delle cittï¿½
 	CityManager manager;
 	
-	//nodi che contengono le città
+	//nodi che contengono le cittï¿½
 	Client[] clients;
 	
 	//segmenti che contengono i nodi
@@ -39,7 +39,7 @@ public class TwoLevelTree implements Solution {
 // Parametri
 //---------------------------------------------------------------------------------------
 	
-	//valore che indica il numero medio di città all'interno di un segmento
+	//valore che indica il numero medio di cittï¿½ all'interno di un segmento
 	private int groupsize = 50;
 	
 //---------------------------------------------------------------------------------------
@@ -125,11 +125,11 @@ public class TwoLevelTree implements Solution {
 			prev_client = clients[city_id];
 			
 			if(client_seq == 0){
-				//il client è il primo del segmento
+				//il client ï¿½ il primo del segmento
 				segments[segment_seq].first = clients[city_id];
 			}
 			if(client_seq == groupsize-1 || i == manager.n -1){
-				//il client è l'ultimo del segmento
+				//il client ï¿½ l'ultimo del segmento
 				segments[segment_seq].last = clients[city_id];
 				segments[segment_seq].client_num = client_seq+1;
 				//bisogna creare un altro segmento
@@ -141,7 +141,7 @@ public class TwoLevelTree implements Solution {
 			client_seq++;
 		}
 		
-		//bisogna collegare l'ultima città e l'ultimo segmento con i propri successivi
+		//bisogna collegare l'ultima cittï¿½ e l'ultimo segmento con i propri successivi
 		clients[last_client_index].next = segments[0].first;
 		segments[0].first.prev = clients[last_client_index];
 		
@@ -157,7 +157,7 @@ public class TwoLevelTree implements Solution {
 	@Override
 	public City next(City c) {
 		
-		//l'id delle città corrispondono agli id dei client
+		//l'id delle cittï¿½ corrispondono agli id dei client
 		Client current = clients[c.city-1];
 		
 		if(current.parent.reverse)
@@ -168,7 +168,7 @@ public class TwoLevelTree implements Solution {
 
 	@Override
 	public City previous(City c) {
-		//l'id delle città corrispondono agli id dei client
+		//l'id delle cittï¿½ corrispondono agli id dei client
 		Client current = clients[c.city-1];
 				
 		if(current.parent.reverse)
@@ -233,7 +233,7 @@ public class TwoLevelTree implements Solution {
 			boolean b_is_with_c = cl_b.parent.equals(cl_c.parent);
 			
 			if(!b_is_with_a && !b_is_with_c){
-				//b è in un segmento differente da quello di a e quello di c
+				//b ï¿½ in un segmento differente da quello di a e quello di c
 				
 				if(cl_a.parent.seq_number < cl_c.parent.seq_number){
 					// il segmento di b deve trovarsi tra quello di a e quello di c
@@ -246,7 +246,7 @@ public class TwoLevelTree implements Solution {
 							cl_b.parent.seq_number < cl_c.parent.seq_number;
 			}
 			else if(b_is_with_a){
-				//b è nello stesso segmento di a
+				//b ï¿½ nello stesso segmento di a
 				
 				if(cl_a.parent.reverse){
 					//b deve avere un numero di sequenza minore di quello di a
@@ -257,7 +257,7 @@ public class TwoLevelTree implements Solution {
 				return cl_b.seq_number > cl_a.seq_number;
 			}
 			else{
-				//b è nello stesso segmento di c
+				//b ï¿½ nello stesso segmento di c
 				
 				if(cl_c.parent.reverse){
 					//b deve avere un numero di sequenza maggiore di quello di c
@@ -319,7 +319,7 @@ public class TwoLevelTree implements Solution {
 				Segment p = next_a.parent;
 				
 				if(next_a.comesBefore(cl_b)){
-					//può essere eseguito un flip interno al segmento
+					//puï¿½ essere eseguito un flip interno al segmento
 					
 					boolean next_a_is_first = next_a.equals(p.getFirst());
 					boolean b_is_last = cl_b.equals(p.getLast());
@@ -332,7 +332,7 @@ public class TwoLevelTree implements Solution {
 						p.setPrev(cl_a.parent);
 					}
 					else{
-						//una città tra b e next(a) è in mezzo al segmento
+						//una cittï¿½ tra b e next(a) ï¿½ in mezzo al segmento
 						
 						int seq_left = next_a.seq_number;
 						int seq_right = cl_b.seq_number;
@@ -456,7 +456,7 @@ public class TwoLevelTree implements Solution {
 					while(keep_swapping){
 						
 						if(next_seg.equals(p)){
-							//c'è un solo segmento nella soluzione
+							//c'ï¿½ un solo segmento nella soluzione
 							break;
 						}
 						
@@ -490,7 +490,7 @@ public class TwoLevelTree implements Solution {
 				boolean b_is_last = cl_b.equals(cl_b.parent.getLast());
 				
 				if(next_a_is_first && b_is_last){
-					//è possibile cambiare solo la direzione dei segmenti tra next(a) e b
+					//ï¿½ possibile cambiare solo la direzione dei segmenti tra next(a) e b
 					
 					Segment next_seg = next_a.parent;
 					
@@ -527,20 +527,20 @@ public class TwoLevelTree implements Solution {
 					
 				}
 				else{
-					//un delle due città è in mezzo al proprio segmento
+					//un delle due cittï¿½ ï¿½ in mezzo al proprio segmento
 					
 					if(!next_a_is_first && !b_is_last){
-						//le città sono entrambe in mezzo al proprio segmento
-						//si può valutare di scambiarne le porzioni esterne dei segmenti
+						//le cittï¿½ sono entrambe in mezzo al proprio segmento
+						//si puï¿½ valutare di scambiarne le porzioni esterne dei segmenti
 						//invece di eseguire uno split
 						
-						//numero di città successive a next(a) nel suo segmento, inclusa next(a)
+						//numero di cittï¿½ successive a next(a) nel suo segmento, inclusa next(a)
 						int num_next_a = next_a.parent.client_num - next_a.seq_number;
 						
 						if(next_a.parent.reverse)
 							num_next_a = next_a.seq_number +1;
 						
-						//numero di città precedenti a b nel suo segmento, inclusa b
+						//numero di cittï¿½ precedenti a b nel suo segmento, inclusa b
 						int num_b = cl_b.seq_number +1;
 						
 						if(cl_b.parent.reverse)
@@ -550,7 +550,7 @@ public class TwoLevelTree implements Solution {
 						int diff = Math.abs(num_next_a - num_b);
 						
 						if(diff <= toll){
-							// si può effettuare lo scambio delle porzioni senza fare split
+							// si puï¿½ effettuare lo scambio delle porzioni senza fare split
 							
 							int seq_num_next_a = next_a.seq_number;
 							int seq_num_b = cl_b.seq_number;
@@ -569,7 +569,7 @@ public class TwoLevelTree implements Solution {
 								next_a_seg.client_num += diff;
 							}
 							
-							//scambio delle città agli estremi dei due segmenti
+							//scambio delle cittï¿½ agli estremi dei due segmenti
 							
 							Client c = next_a_seg.getLast();
 							next_a_seg.setLast(b_seg.getFirst());
@@ -745,23 +745,23 @@ public class TwoLevelTree implements Solution {
 							}
 							else{
 								//split sul segmento di next(a)
-								//se il segmento precedente contiene b si è
+								//se il segmento precedente contiene b si ï¿½
 								//costretti a fare merge sul segmento successivo
 								if(next_a.parent.getPrev().equals(cl_b.parent)){
 									//bisogna fare merge sul segmento successivo
 									splitAndMergeOnNext(next_a);
 									
-									//lo split sul segmento di b può essere eseguito al meglio
+									//lo split sul segmento di b puï¿½ essere eseguito al meglio
 									//per bilanciare i segmenti
 									splitAndMerge(next_b);
 								}
 								else{
-									//si può eseguire il merge migliore dopo lo split del
+									//si puï¿½ eseguire il merge migliore dopo lo split del
 									//segmento di next(a)
 									splitAndMerge(next_a);
 									
 									//bisogna controllare che dopo il merge il segmento in cui
-									//c'è next(a) non sia quello successivo a quello contenente b
+									//c'ï¿½ next(a) non sia quello successivo a quello contenente b
 									
 									if(cl_b.parent.getNext().equals(next_a.parent))
 										//bisogna fare merge sul segmento precedente
@@ -769,12 +769,12 @@ public class TwoLevelTree implements Solution {
 									else if(cl_b.parent.equals(next_a.parent))
 										splitAndMergeOnNext(next_b);
 									else
-										//si può eseguire il merge migliore
+										//si puï¿½ eseguire il merge migliore
 										splitAndMerge(next_b);
 								}
 							}
 							
-							//è possibile cambiare solo la direzione dei segmenti tra next(a) 
+							//ï¿½ possibile cambiare solo la direzione dei segmenti tra next(a) 
 							//e b
 							Segment next_seg = next_a.parent;
 							
@@ -816,14 +816,14 @@ public class TwoLevelTree implements Solution {
 						if(!next_a_is_first){
 							//bisogna splittare il segmento contenete next(a)
 							
-							//se il segmento precedente contiene b, che è già l'ultimo, si è
+							//se il segmento precedente contiene b, che ï¿½ giï¿½ l'ultimo, si ï¿½
 							//costretti a fare merge sul segmento successivo
 							
 							if(next_a.parent.getPrev().equals(cl_b.parent))
 								//bisogna fare merge sul segmento successivo
 								splitAndMergeOnNext(next_a);
 							else
-								//si può eseguire il merge migliore
+								//si puï¿½ eseguire il merge migliore
 								splitAndMerge(next_a);
 						}
 							
@@ -831,18 +831,18 @@ public class TwoLevelTree implements Solution {
 						if(!b_is_last){
 							//bisogna splittare il segmento contenete b
 							
-							//se il segmento successivo contiene next(a), che è già il primo,
-							//siè costretti a fare merge sul segmento precedente
+							//se il segmento successivo contiene next(a), che ï¿½ giï¿½ il primo,
+							//siï¿½ costretti a fare merge sul segmento precedente
 							
 							if(cl_b.parent.getNext().equals(next_a.parent))
 								//bisogna fare merge sul segmento successivo
 								splitAndMergeOnPrev(next_b);
 							else
-								//si può eseguire il merge migliore
+								//si puï¿½ eseguire il merge migliore
 								splitAndMerge(next_b);
 						}
 						
-						//è possibile cambiare solo la direzione dei segmenti tra next(a) e b
+						//ï¿½ possibile cambiare solo la direzione dei segmenti tra next(a) e b
 						
 						Segment next_seg = next_a.parent;
 						
@@ -915,31 +915,31 @@ public class TwoLevelTree implements Solution {
 	private static void splitAndMerge(Client cut){
 		Segment parent = cut.parent;
 		
-		//numero di città alla destra del taglio
+		//numero di cittï¿½ alla destra del taglio
 		int num_right = parent.client_num - cut.seq_number;
 		if(parent.reverse)
 			num_right = cut.seq_number + 1;
 		
-		//numero di città alla sinistra del taglio
+		//numero di cittï¿½ alla sinistra del taglio
 		int num_left = parent.client_num - num_right;
 		
 		//segmento successivo
 		Segment next_seg = parent.getNext();
 		
-		//numero di città nel segmento successivo dopo il merge con esso
+		//numero di cittï¿½ nel segmento successivo dopo il merge con esso
 		int num_next = next_seg.client_num + num_right;
 		
 		//segmento precedente
 		Segment prev_seg = parent.getPrev();
 		
-		//numero di città nel segmento precedente dopo il merge con esso
+		//numero di cittï¿½ nel segmento precedente dopo il merge con esso
 		int num_prev = prev_seg.client_num + num_left;
 		
-		//si sceglie di ottenere i segmenti più corti
+		//si sceglie di ottenere i segmenti piï¿½ corti
 		boolean merge_on_next = num_next < num_prev;
 		
 		if(merge_on_next){
-			//parte del segmento originale verrà unito al segmento successivo
+			//parte del segmento originale verrï¿½ unito al segmento successivo
 			
 			if(next_seg.reverse){
 				//bisogna spostare i client e spostarli alla fine del segmento
@@ -1008,7 +1008,7 @@ public class TwoLevelTree implements Solution {
 			
 		}
 		else{
-			//parte del segmento originale verrà unito al segmento precedente
+			//parte del segmento originale verrï¿½ unito al segmento precedente
 			
 			if(!prev_seg.reverse){
 				//bisogna spostare i client e spostarli alla fine del segmento
@@ -1083,7 +1083,7 @@ public class TwoLevelTree implements Solution {
 	private static void splitAndMergeOnNext(Client cut){
 		Segment parent = cut.parent;
 		
-		//numero di città alla destra del taglio
+		//numero di cittï¿½ alla destra del taglio
 		int num_right = parent.client_num - cut.seq_number;
 		if(parent.reverse)
 			num_right = cut.seq_number + 1;
@@ -1091,7 +1091,7 @@ public class TwoLevelTree implements Solution {
 		//segmento successivo
 		Segment next_seg = parent.getNext();
 		
-		//numero di città nel segmento successivo dopo il merge con esso
+		//numero di cittï¿½ nel segmento successivo dopo il merge con esso
 		int num_next = next_seg.client_num + num_right;
 		
 		if(next_seg.reverse){
@@ -1166,18 +1166,18 @@ public class TwoLevelTree implements Solution {
 	private static void splitAndMergeOnPrev(Client cut){
 		Segment parent = cut.parent;
 		
-		//numero di città alla destra del taglio
+		//numero di cittï¿½ alla destra del taglio
 		int num_right = parent.client_num - cut.seq_number;
 		if(parent.reverse)
 			num_right = cut.seq_number + 1;
 		
-		//numero di città alla sinistra del taglio
+		//numero di cittï¿½ alla sinistra del taglio
 		int num_left = parent.client_num - num_right;
 		
 		//segmento precedente
 		Segment prev_seg = parent.getPrev();
 		
-		//numero di città nel segmento precedente dopo il merge con esso
+		//numero di cittï¿½ nel segmento precedente dopo il merge con esso
 		int num_prev = prev_seg.client_num + num_left;
 		
 		if(!prev_seg.reverse){
@@ -1298,8 +1298,8 @@ public class TwoLevelTree implements Solution {
 	}
 	
 	
-	//disponendo di un city manager non dovrebbe servire una città di riferimento
-	//oltretutto il tour non ha una vera città di inizio
+	//disponendo di un city manager non dovrebbe servire una cittï¿½ di riferimento
+	//oltretutto il tour non ha una vera cittï¿½ di inizio
 	
 	@Override
 	public City startFrom() {
@@ -1307,7 +1307,7 @@ public class TwoLevelTree implements Solution {
 		return null;
 	}
 	
-	//questi metodi non dovrebbero servire, l'aggiornamento della lunghezza è interno
+	//questi metodi non dovrebbero servire, l'aggiornamento della lunghezza ï¿½ interno
 
 	
 	@Override
@@ -1320,6 +1320,55 @@ public class TwoLevelTree implements Solution {
 	public void setLength(int length) {
 		// TODO Auto-generated method stub
 
+	}
+
+	@Override
+	public void swap(City a, City b) {
+		Client ca = clients[a.city-1];
+		Client cb = clients[b.city-1];
+		
+		
+		Client prev_ca = ca.prev;
+		Client next_ca = ca.next;
+		Segment parent_ca = ca.parent;
+		int seq_ca = ca.seq_number;
+		
+		Client prev_cb = cb.prev;
+		Client next_cb = cb.next;
+		
+		ca.prev = cb.prev;
+		ca.next = cb.next;
+		ca.parent = cb.parent;
+		ca.seq_number = cb.seq_number;
+		
+		cb.prev = prev_ca;
+		cb.next = next_ca;
+		cb.parent = parent_ca;
+		cb.seq_number = seq_ca;
+		
+		Edge old_1 = manager.getEdge(ca.city ,next_ca.city);		
+		Edge old_2 = manager.getEdge(prev_ca.city,ca.city);
+		Edge old_3 = manager.getEdge(cb.city,next_cb.city);		
+		Edge old_4 = manager.getEdge(prev_cb.city, cb.city);
+					
+		Edge new_1= manager.getEdge(ca.city,next_cb.city);
+		Edge new_2=manager.getEdge(prev_cb.city, ca.city);
+		Edge new_3= manager.getEdge(cb.city,next_ca.city);
+		Edge new_4=manager.getEdge(prev_ca.city,cb.city);
+	
+		edges.remove(old_1);
+		edges.remove(old_2);
+		edges.remove(old_3);
+		edges.remove(old_4);
+		edges.add(new_1);
+		edges.add(new_2);
+		edges.add(new_3);
+		edges.add(new_4);
+	
+		length += -old_1.getLength()-old_2.getLength()-old_3.getLength()
+					-old_4.getLength()+new_1.getLength()+new_2.getLength()+
+											new_3.getLength()+new_4.getLength();
+		
 	}
 
 

@@ -170,9 +170,9 @@ public class PSO_LK_Tester implements Tester {
 			//tempo impiegato per creare una soluzione
 			long start_sol = System.currentTimeMillis();
 			
-			Array_solution solution = new Array_solution(init_sol, manager);
+			//Array_solution solution = new Array_solution(init_sol, manager);
 			
-			//TwoLevelTree solution = new TwoLevelTree(manager, init_sol, 32);
+			TwoLevelTree solution = new TwoLevelTree(manager, init_sol, 62);
 			
 			solution_times[i] = System.currentTimeMillis() - start_sol;
 			
@@ -200,9 +200,9 @@ public class PSO_LK_Tester implements Tester {
 			//tempo impiegato per l'esplorazione
 			long start_exploring = System.currentTimeMillis();
 			
-			Array_solution best_solution = (Array_solution) explorer.explore();
+			//Array_solution best_solution = (Array_solution) explorer.explore();
 			
-			//TwoLevelTree best_solution = (TwoLevelTree) explorer.explore();
+			TwoLevelTree best_solution = (TwoLevelTree) explorer.explore();
 			
 			exploring_times[i] = System.currentTimeMillis() - start_exploring;
 			
