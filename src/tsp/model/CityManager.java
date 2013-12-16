@@ -12,6 +12,8 @@ public class CityManager {
 	public int n;
 	private int maxNeighbors;
 	
+	private City[][] nearestNew;
+	
 	public CityManager(City[] cities){
 		this(cities,cities.length-1);
 	}
@@ -36,7 +38,7 @@ public class CityManager {
 		return cities[city-1];
 	}
 	
-	//metodo per la creazione di archi tra città
+	//metodo per la creazione di archi tra citta
 	public Edge getEdge(City a, City b){
 		return new Edge(a, b, cost(a, b));
 	}
@@ -181,6 +183,16 @@ public class CityManager {
 		}
 		
 		return sb.toString();
+	}
+
+	public City[] getNearestNew(City c) {
+		
+		City[][] nearestNew = new City[this.n][];
+		for(City d: cities){
+			nearestNew[d.city-1] = bestNearestOf(c);
+		}
+		return nearestNew[c.city-1];
+	
 	}
 
 }
