@@ -14,6 +14,7 @@ import org.uncommons.watchmaker.framework.SelectionStrategy;
 import org.uncommons.watchmaker.framework.TerminationCondition;
 import org.uncommons.watchmaker.framework.operators.EvolutionPipeline;
 import org.uncommons.watchmaker.framework.selection.StochasticUniversalSampling;
+import org.uncommons.watchmaker.framework.termination.ElapsedTime;
 import org.uncommons.watchmaker.framework.termination.GenerationCount;
 import org.uncommons.watchmaker.framework.termination.Stagnation;
 
@@ -76,9 +77,10 @@ public class GeneticHybridSolver implements Explorer {
 		TerminationCondition theEvoulutionEngine = (TerminationCondition)hybridGenerationalEvolutionEngine;
 		GenerationCount generationCounter = new GenerationCount(generationCount);
 		Stagnation stagnationRecognizer = new Stagnation((int)(Math.sqrt(generationCount)), false);
+		ElapsedTime elapsedTime = new ElapsedTime(5*60*1000);
 		
 		hybridGenerationalEvolutionEngine.setParameters(maxGlobalIterations, maxIntensifierIterations, maxIntensifierNotImprovingIterations, startTenure);
-		Solution optimum = hybridGenerationalEvolutionEngine.evolve(populationSize, eliteCount, generationCounter, theEvoulutionEngine,stagnationRecognizer);
+		Solution optimum = hybridGenerationalEvolutionEngine.evolve(populationSize, eliteCount, generationCounter, theEvoulutionEngine,stagnationRecognizer,elapsedTime);
 		
 		iterations = hybridGenerationalEvolutionEngine.getIterations();
 		

@@ -1,5 +1,9 @@
 package tsp.tabusearch;
 
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
+
 import tsp.model.City;
 import tsp.model.CityManager;
 import tsp.model.Solution;
@@ -10,6 +14,7 @@ public class TSMoveManager {
 	private TSTabuList tabuList;
 	private TSObjectiveFunction objFunct;
 	private CityManager cityManager;
+	private Set<City> lookcities;
 	
 	public TSMoveManager(TSTabuList tabuList, TSObjectiveFunction objFunct, CityManager cityManager) {
 		this.tabuList = tabuList;
@@ -129,6 +134,100 @@ public class TSMoveManager {
 		}
 		
 		return best;
+	}
+	
+	public Move3Opt nextMoveTrunc3DontLook(Solution s){
+		Move3Opt best = null;
+		int bestMoveValue = Integer.MAX_VALUE; 
+		
+		if(lookcities == null){
+			lookcities = new HashSet<>(2*cityManager.n);
+			City st = s.startFrom();
+			City act = st;
+			do{
+				lookcities.add(act);				 
+				act = s.next(act);
+			}while(!act.equals(st));
+		}
+		
+		
+		Iterator<City> iterator = lookcities.iterator();
+		
+		boolean flag = true;
+		City ta = null;
+		City tb = null;
+		City[] neighborsTb = null;;
+		Move3Opt candidate = null;
+		Move3Opt bestCandidate = null;
+		int bestCandidateValue = Integer.MAX_VALUE;
+		City[] neighborsTd;
+		
+		
+		
+		while(iterator.hasNext()){
+			ta = iterator.next(); //a node
+			tb = s.next(ta); // b node
+			neighborsTb = cityManager.getNearest(tb);
+			candidate = new Move3Opt(ta, tb, null, null, null, null, objFunct);
+			bestCandidate = null;
+			bestCandidateValue = Integer.MAX_VALUE;
+			
+			flag = false;
+			
+			for(City tc : neighborsTb){
+				
+				if( s.between(ta, tb, tc) ){
+					
+					candidate.c = tc;
+					candidate.d = s.previous(tc);
+					neighborsTd = cityManager.getNearest(candidate.d);
+					
+					for(City te : neighborsTd){						
+						
+						if(s.between(tc, te, ta)){
+							candidate.e = te;
+							candidate.f = s.previous(te);
+						
+							if(candidate.updateEvaluation() < bestCandidateValue && !tabuList.isTabu(s,candidate)){
+				 				bestCandidate = (Move3Opt) candidate.clone();
+								bestCandidateValue = bestCandidate.eval;
+							}
+							if(!flag && candidate.eval < 0){
+								flag = true;
+							}
+						}
+						
+					}
+					
+				}
+			
+			}
+			
+			if(bestCandidateValue < bestMoveValue){
+				best = bestCandidate;
+				bestMoveValue = bestCandidateValue;
+			}
+			
+			if(!flag){
+				iterator.remove();
+			}
+		
+		}
+		
+		if(best != null){
+			lookcities.add(best.a);
+			lookcities.add(best.b);
+			lookcities.add(best.d);
+			lookcities.add(best.e);
+			lookcities.add(best.f);
+		}
+		
+		return best;
+	}
+	
+	
+	public void initialize(){
+		lookcities = null;
 	}
 
 }

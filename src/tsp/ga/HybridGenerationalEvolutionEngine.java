@@ -143,23 +143,23 @@ public class HybridGenerationalEvolutionEngine implements
 	}
 
 	protected List<EvaluatedCandidate<TSSolution>> evaluatePopulation(List<TSSolution> population) {
-		
-		final TabuSearch ts = new TabuSearch(cityManager, aspirationCriteria, startTenure, maxIntensifierNotImprovingIterations, maxIntensifierIterations);
-		
-		 List<EvaluatedCandidate<TSSolution>> evaluatedPopulation = new ArrayList<EvaluatedCandidate<TSSolution>>(population.size());
 
-	        for (TSSolution candidate : population){
-	        	if((this.maxGlobalIterations-this.iterations) > 0){
-		        	if((this.maxGlobalIterations-this.iterations) < this.maxIntensifierIterations){
-		        		ts.setParams(startTenure, maxIntensifierNotImprovingIterations, this.maxGlobalIterations-this.iterations);
-		        	}
-		        	Solution improved = ts.improve(candidate);
-		    		candidate = (TSSolution) improved;       	
-		    		this.iterations += ts.iterations;
-	        	}
-	        	evaluatedPopulation.add(new EvaluatedCandidate<TSSolution>(candidate, candidate.length()));
-	       }
-		
+		final TabuSearch ts = new TabuSearch(cityManager, aspirationCriteria, startTenure, maxIntensifierNotImprovingIterations, maxIntensifierIterations);
+
+		List<EvaluatedCandidate<TSSolution>> evaluatedPopulation = new ArrayList<EvaluatedCandidate<TSSolution>>(population.size());
+
+		for (TSSolution candidate : population){
+			if((this.maxGlobalIterations-this.iterations) > 0){
+				if((this.maxGlobalIterations-this.iterations) < this.maxIntensifierIterations){
+					ts.setParams(startTenure, maxIntensifierNotImprovingIterations, this.maxGlobalIterations-this.iterations);
+				}
+				Solution improved = ts.improve(candidate);
+				candidate = (TSSolution) improved;       	
+				this.iterations += ts.iterations;
+			}
+			evaluatedPopulation.add(new EvaluatedCandidate<TSSolution>(candidate, candidate.length()));
+		}
+
 		return evaluatedPopulation;
 	}
 

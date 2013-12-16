@@ -54,6 +54,7 @@ public class TabuSearch implements Intensifier {
 		int prevLength;
 		
 		tabuList.initialize();
+		moveManager.initialize();
 		
 		objectiveFunction.evaluate(start);
 		current = (Solution) start.clone();
@@ -61,9 +62,10 @@ public class TabuSearch implements Intensifier {
 		aspirationCriteria.setBestSolution(best);
 		prevLength = objectiveFunction.evaluate(best);
 		
-		for(iterations = 0, notImprovingIterations = 0; iterations < maxIterations && notImprovingIterations < maxNotImprovingIterations; iterations++, tabuList.nextIteration()){
+		for(iterations = 0, notImprovingIterations = 0; iterations < maxIterations && notImprovingIterations <= maxNotImprovingIterations; iterations++, tabuList.nextIteration()){
 		
 			move = moveManager.nextMoveTrunc3(current);
+			//move = moveManager.nextMoveTrunc3DontLook(current);
 
 			if(move == null){
 				notImprovingIterations++;

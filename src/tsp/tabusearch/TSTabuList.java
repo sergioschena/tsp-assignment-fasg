@@ -38,8 +38,8 @@ public class TSTabuList {
 	}
 	
 	public void initialize(){
-		tabus = new HashSet<TabuEdge>();
-		tabuList = new HashMap<Integer,HashSet<TabuEdge>>();
+		tabus = new HashSet<TabuEdge>(5*(currentTenure+1));
+		tabuList = new HashMap<Integer,HashSet<TabuEdge>>(currentTenure*2);
 	}
 	
 	public void addTabu(Move m){	
@@ -151,7 +151,7 @@ public class TSTabuList {
 	private void addTabuEdge(TabuEdge te){
 		
 		if(!tabuList.containsKey(currentTenure)){
-			tabuList.put(currentTenure, new HashSet<TabuEdge>());
+			tabuList.put(currentTenure, new HashSet<TabuEdge>(5*(currentTenure+1)));
 		}
 		
 		tabuList.get(currentTenure).add(te);
