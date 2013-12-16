@@ -11,6 +11,7 @@ import Instances.Instance;
 import LK.LK_Intesifier;
 import PSO.PSO_Explorer;
 import Solution_Data_Structure.Array_solution;
+import Two_Level_Tree.TwoLevelTree;
 
 public class PSO_LK_Tester implements Tester {
 	
@@ -29,6 +30,8 @@ public class PSO_LK_Tester implements Tester {
 	
 	int min_tour_length;
 	
+	long best_solution_time;
+	
 	int max_tour_length;
 	
 	long[] solution_times;
@@ -45,7 +48,7 @@ public class PSO_LK_Tester implements Tester {
 	
 	//Parametri LK
 	
-	//numero di città iniziali da valutare al massimo
+	//numero di cittï¿½ iniziali da valutare al massimo
 	//valori di test: 25, 50, 75, 100
 	private int max_t1 = 25;
 	
@@ -63,7 +66,7 @@ public class PSO_LK_Tester implements Tester {
 	
 	//numero massimo di archi scambiabili a ogni iterazione
 	//valori di test: 100, 250, 500, 750
-	//inversamente proporzionale al numero di città iniziali da valutare
+	//inversamente proporzionale al numero di cittï¿½ iniziali da valutare
 	//			max_lambda*max_t1 = 20000
 	private int max_lambda = 100;
 	
@@ -101,9 +104,9 @@ public class PSO_LK_Tester implements Tester {
 //	Costruttore e setter
 //-------------------------------------------------------------------------------------
 	
-	public PSO_LK_Tester(Instance tsp_instance){
+	public PSO_LK_Tester(Instance tsp_instance, CityManager manager){
 		this.tsp_instance = tsp_instance;
-		this.manager = this.tsp_instance.getCityManager();
+		this.manager = manager;
 	}
 	
 	@Override
@@ -169,6 +172,8 @@ public class PSO_LK_Tester implements Tester {
 			
 			Array_solution solution = new Array_solution(init_sol, manager);
 			
+			//TwoLevelTree solution = new TwoLevelTree(manager, init_sol, 32);
+			
 			solution_times[i] = System.currentTimeMillis() - start_sol;
 			
 			//tempo impiegato per costruire un intensificatore
@@ -197,13 +202,17 @@ public class PSO_LK_Tester implements Tester {
 			
 			Array_solution best_solution = (Array_solution) explorer.explore();
 			
+			//TwoLevelTree best_solution = (TwoLevelTree) explorer.explore();
+			
 			exploring_times[i] = System.currentTimeMillis() - start_exploring;
 			
 			//lunghezza della soluzione ottenuta
 			tour_lengths[i] = best_solution.length();
 			
-			if(tour_lengths[i]<min_tour_length)
+			if(tour_lengths[i]<min_tour_length){
 				min_tour_length = tour_lengths[i];
+				best_solution_time = exploring_times[i];
+			}
 			
 			if(tour_lengths[i]>max_tour_length)
 				max_tour_length = tour_lengths[i];
@@ -325,6 +334,27 @@ public class PSO_LK_Tester implements Tester {
 			avg += l;
 		
 		return avg/(long)intensifier_times.length;
+	}
+
+	@Override
+	public double getMINErrorFromOptimum() {
+		double min = (double)getMINTourLength();
+		if(min<0)
+			return -1;
+		
+		double opt = (double)tsp_instance.getOptimum();
+		
+		double diff = min - opt;
+		
+		return diff/opt;
+	}
+
+	@Override
+	public long getTimeofBestSolution() {
+		if(exploring_times.length==0)
+			return -1;
+		
+		return best_solution_time;
 	}
 
 }

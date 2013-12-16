@@ -27,7 +27,11 @@ public interface Tester {
 	//restituisce l'errore percentuale della soluzione media rispetto a quella ottimale
 	public double getErrorFromOptimum();
 	
-	//restituisce il tempo medio per costruire una soluzione a partire da un array di città
+	public double getMINErrorFromOptimum();
+	
+	public long getTimeofBestSolution();
+	
+	//restituisce il tempo medio per costruire una soluzione a partire da un array di cittï¿½
 	public long getAVGSolutionTime();
 	
 	//restituisce il tempo medio per costruire una soluzione iniziale
