@@ -25,6 +25,6 @@ public interface Solution extends Cloneable {
 	
 	public Set<Edge> getEdges();
 	
-	//flip virtuali???
+	public void swap(City a, City b);
 	
 }

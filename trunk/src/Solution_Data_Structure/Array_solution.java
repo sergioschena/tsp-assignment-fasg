@@ -109,7 +109,7 @@ public class Array_solution implements Solution{
 			
 			int cnt = (nexta<pb ? pb-nexta-1: size+pb-nexta-1)/2; 
 			for(; cnt >= 0; cnt--){
-				swap(nexta,pb);
+				internalSwap(nexta,pb);
 				nexta = (nexta+1)%size;
 				pb = (size+pb-1)%size;
 			}
@@ -141,7 +141,7 @@ public class Array_solution implements Solution{
 		return null;
 	}
 
-	private void swap(int next_a,int pb) {
+	private void internalSwap(int next_a,int pb) {
 		// TODO Auto-generated method stub
 		City c_next_a=cities[next_a];
 		City c_b = cities[pb];
@@ -219,6 +219,46 @@ public class Array_solution implements Solution{
 		// TODO Auto-generated method stub
 		
 	}
+	
+	@Override
+	public void swap(City a, City b) {
+		int pa = position[a.city-1];
+		int pb = position[b.city-1];
+		
+		City next_a = next(a);
+		City next_b = next(b);
+		
+		City prev_a = previous(a);
+		City prev_b = previous(b);
+		
+		cities[pa]= b;
+		cities[pb]= a;
+		
+		position[b.city-1] = pa;
+		position[a.city-1] = pb;
+		
+		Edge old_1 = manager.getEdge(a,next_a);		
+		Edge old_2 = manager.getEdge(b,next_b);
+		Edge old_3 = manager.getEdge(a,prev_a);		
+		Edge old_4 = manager.getEdge(b,prev_b);
+					
+		Edge new_1= manager.getEdge(a,next_b);
+		Edge new_2=manager.getEdge(a,prev_b);
+		Edge new_3= manager.getEdge(b,prev_a);
+		Edge new_4=manager.getEdge(next_a,b);
+	
+		edges.remove(old_1);
+		edges.remove(old_2);
+		edges.remove(old_3);
+		edges.remove(old_4);
+		edges.add(new_1);
+		edges.add(new_2);
+		edges.add(new_3);
+		edges.add(new_4);
+	
+		cost=cost-old_1.getLength()-old_2.getLength()-old_3.getLength()-old_4.getLength()+new_1.getLength()+new_2.getLength()+new_3.getLength()+new_4.getLength();
+	}
+	
 
 	
 
