@@ -13,52 +13,56 @@ import Initial_Solution.*;
 
 public class main {
 	
-	//Perboli's main:
-	
 	private enum ParamFile {
 	    NONE, PARAMS, INSTANCES
 	}
 	
 	public static void main(String[] args) {
-		   	
-//      	String myFile = new String("C:/Users/Guido/EclipseWorkspace/OpenTS/Data/TSP/berlin52.tsp");
-//    		String myFile = new String("C:/Users/Guido/EclipseWorkspace/OpenTS/Data/TSP/eil51.tsp");       	
-//    		String myFile = new String("C:/Users/Guido/EclipseWorkspace/OpenTS/Data/TSP/eil76.tsp");
-//    		String myFile = new String("C:/Users/Guido/EclipseWorkspace/OpenTS/Data/TSP/pr152.tsp");    		
-//       	String myFile = new String("C:/Users/Guido/EclipseWorkspace/OpenTS/Data/TSP/pr1002.tsp");
-//   		String myFile = new String("C:/Users/Guido/EclipseWorkspace/OpenTS/Data/TSP/rat195.tsp");
-    	
+
     	//lettura file con parametri:
-    	String myFileParam = "ProvaParam.txt";
+    	String myFileParam = "/Users/giuliazago/Documents/workspace/Prova_lettura/src/param.txt";
     	LinkedList<String> istancesnames = readParams(myFileParam); //oppure si passa arg[0]
+    	String dirName = istancesnames.getFirst();
     	LinkedList<Istance> istances = new LinkedList<Istance>();
        	
     	//lettura dei file delle istanze:
-    	for(int i=0; i<istancesnames.size(); i++){
-    		Istance ist = new Istance(istancesnames.get(i));
-    		istances.push(ist);
+    	for(int i=1; i<istancesnames.size(); i++){ //prima istanza e' dirName
+    		Istance ist = new Istance(dirName + istancesnames.get(i));
+    		istances.add(ist);
     			
     	}
     	
     	//elaborazione di ognuna delle istanze:
-    	for(int j=0; j<istances.size(); j++){
+    	for(int j=0; j<istances.size(); j++){ 
     		
-    		// ...
-    		// ...
+    		//...
     		
-    		//prova di generazione di soluzione inziale:
+    		//generazione della soluzione inziale:
     		Istance ist = istances.get(j);
-    		NearestNeighbor n1 = new NearestNeighbor(ist.cities_arr);
-    		City[] sol1 = n1.generate();
-    		int k=10; //prova
-    		City[] sol1k = n1.generate(k);
     		
+    		int k=10; //numero citta' vicine da considerare
+    		CityManager cm = new CityManager(ist.getCitiesArr(), k);
+    		NearestNeighbor nn = new NearestNeighbor(cm);
+    		
+    		
+    		City[] initialSolution = nn.generate(); //genera una soluzione scegliendo la prima tra le k citta' piu' vicine
+    		cm.clearVisited();
+    		
+    		/* Il CityManager se inizializzato con k cerca automaticamente le k citta' piu' vicine con il metodo getNearest.
+    		 * E' conveniente creare un solo cm per ogni insieme di istanze.
+    		 * Deve essere possibile generare la sol iniziale sia tra le k che tra tutte le citta'
+    		 */
+
+    		
+    		City[] initialSolutionK = nn.generate(k);  //genera una soluzione scegliendone una random tra le k citta' piu' vicine 
+    		
+    		//...
+    		
+    		//print:
+    		System.out.println(nn.toString());
+    		//System.out.println("Initial solution: " + nn.toString(k));
+    		System.out.println(cm.toString());
     	}
-    	
-    	
-        
-		
-     
 
 	}
 	
@@ -114,7 +118,15 @@ public class main {
 						else
 						{
 							//Read the parameters
-							// cosa ci serve leggere? numero di iterazioni? 
+							st = new StringTokenizer(line);	
+							token = st.nextToken(); 
+							if ( token.equals("DataFileDir")){
+								token = st.nextToken();
+								String s = token ;
+								istances.add(s);
+							}
+							
+							// serve numero di iterazioni? 
 						}
 						break;
 					case INSTANCES:
@@ -126,7 +138,7 @@ public class main {
 						else
 						{
 							String i = line;
-							istances.push(i);
+							istances.add(i);
 						}
 						break;
 					default: 

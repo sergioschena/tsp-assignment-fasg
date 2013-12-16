@@ -11,16 +11,15 @@ public class Istance {
 	public String fileName;
 	public int N; //number of nodes
 	public LinkedList<City> cities_ll = new LinkedList<City>();
-	public City[] cities_arr; //serve?
+	public City[] cities_arr;
 	
 	
-	public Istance(String fileName){ 
+	public Istance(String file){ 
 		
-		this.fileName = fileName;
+		this.fileName = file;
+		System.out.println("Apertura file istanze: " + this.fileName);
 		
-		//Perboli's lettura file istanze:
-		try
-		{
+		try{
 			File input = new File(fileName);
 			BufferedReader br = new BufferedReader(	new InputStreamReader(new FileInputStream(input)));
 			String line;
@@ -32,8 +31,8 @@ public class Istance {
 			StringTokenizer st = new StringTokenizer(line);	
 			token = st.nextToken();
 			token = st.nextToken();		
-			this.N = Integer.parseInt(token); 
-	        //customers = new double[numCustomers][2];
+			this.N = Integer.parseInt(token);
+			cities_arr = new City[this.N];
 			line = br.readLine();
 			line = br.readLine();
 	        for( int i = 0; i < this.N; i++ )
@@ -44,20 +43,17 @@ public class Istance {
 				int n = Integer.parseInt(token); 
 				token = st.nextToken();
 				double x = Double.parseDouble(token);
-				//customers[i][0] = Double.parseDouble(token); 
 				token = st.nextToken();
-				double y = Double.parseDouble(token);
-				//customers[i][1] = Double.parseDouble(token); 
+				double y = Double.parseDouble(token); 
 				City c = new City(n, x, y);
+				cities_arr[i]=c;
 		    	cities_ll.add(c);
 				
 	        }
 			line = br.readLine();						
-			if (!line.toUpperCase().contains("EOF"))
-			{
+			if (!line.toUpperCase().contains("EOF")){
 				throw new IllegalArgumentException("Error while reading the input file: EOF Section");
 			}
-
 		}
 		catch (Exception e) {
 			e.printStackTrace();
@@ -66,26 +62,6 @@ public class Istance {
 		}
 		
 	}
-		
-	
-		
-	/*	//mio :
-	
-		FileReader f;
-	    f=new FileReader(fileName);
-		BufferedReader b;
-		b=new BufferedReader(f);
-		String s = null;
-		//TODO lettura del nome istanza - serve?
-		for(int i=0; i<4; i++){
-			s=b.readLine();
-		}//gets the row with N number of cities
-		StringTokenizer st = new StringTokenizer(s, ":"); //TODO controllare spazio dopo ":"
-		st.nextToken();
-    	int n = Integer.parseInt(st.toString());
-    	this.N=n;
-    	b.close();
-	} */
 	
 	public String getFileName(){
 		return fileName;
@@ -100,41 +76,8 @@ public class Istance {
 	}
 	
 	public City[] getCitiesArr(){
-		return (City[]) cities_ll.toArray();
-	}
-	
-	/*public City[] IstanceGenerator() throws IOException{ 
 		
-		FileReader f;
-	    f=new FileReader(this.fileName);
-		BufferedReader b;
-	    b=new BufferedReader(f);
-	    String s = null;
-	    while( s.equals("NODE_COORD_SECTION")!=true ){ //read rows of input file till this one
-	    	s=b.readLine();
-	    }
-	    
-	    StringTokenizer st;
-	    int a, x, y;
-	    
-	    for(int i=0; i<N; i++){ //read following N rows and save into a City and put them into a list
-	    	s=b.readLine();
-	    	st = new StringTokenizer(s);
-	    	a = Integer.parseInt(st.toString());
-	    	st.nextToken();
-	    	x = Integer.parseInt(st.toString());
-	    	st.nextToken();
-	    	y = Integer.parseInt(st.toString());
-	    	
-	    	City c = new City(a, x, y);
-	    	cities_ll.add(c);
-	    	
-	    }
-	    
-	    b.close();
-	    cities_arr = (City[]) cities_ll.toArray();
-	    return cities_arr;
-			
-	}*/
+		return cities_arr;
+	}
 
 }
