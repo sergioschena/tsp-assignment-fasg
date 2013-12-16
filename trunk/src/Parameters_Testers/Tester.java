@@ -9,9 +9,6 @@ public interface Tester {
 	//esegue gli algoritmi e ricalcola le medie
 	public void updateTests();
 	
-	//restituisce il tempo necessario a costruire una matrice delle distanze
-	public long getDistanceMatrixTime();
-	
 	//restituisce il tempo medio per eseguire il metodo explore() di un Explorer
 	public long getAVGExploringTime();
 	

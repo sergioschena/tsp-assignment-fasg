@@ -1,6 +1,7 @@
 package Instances;
 
 import tsp.model.City;
+import tsp.model.CityManager;
 
 public class Pr1002 implements Instance {
 
@@ -1019,6 +1020,11 @@ City[] cities = new City[1002];
 	@Override
 	public City[] getCities() {
 		return cities;
+	}
+	
+	@Override
+	public CityManager getCityManager() {
+		return new CityManager(cities);
 	}
 
 }
