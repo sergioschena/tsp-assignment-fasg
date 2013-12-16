@@ -4,6 +4,7 @@ import tsp.model.CityManager;
 import Instances.Berlin52;
 import Instances.Cities76;
 import Instances.Eil51;
+import Instances.Fl3795;
 import Instances.Pr1002;
 import Instances.Pr152;
 import Instances.Rat195;
@@ -16,9 +17,9 @@ public class MainTest_PSO_LK {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		
-		Pr152 instance = new Pr152();
+		Fl3795 instance = new Fl3795();
 		
-		CityManager manager = new CityManager(instance.getCities());
+		CityManager manager = new CityManager(instance.getCities(), 15);
 		
 		PSO_LK_Tester tester = new PSO_LK_Tester(instance, manager);
 		
