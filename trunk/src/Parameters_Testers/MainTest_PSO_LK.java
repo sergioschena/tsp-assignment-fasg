@@ -17,9 +17,21 @@ public class MainTest_PSO_LK {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		
-		Fl3795 instance = new Fl3795();
+		//Berlin52 instance = new Berlin52();
 		
-		CityManager manager = new CityManager(instance.getCities(), 15);
+		//Eil51 instance = new Eil51();
+		
+		//Pr152 instance = new Pr152();
+		
+		//Rat195 instance = new Rat195();
+		
+		//Cities76 instance = new Cities76();
+		
+		Pr1002 instance = new Pr1002();
+		
+		//Fl3795 instance = new Fl3795();
+				
+		CityManager manager = new CityManager(instance.getCities());
 		
 		PSO_LK_Tester tester = new PSO_LK_Tester(instance, manager);
 		

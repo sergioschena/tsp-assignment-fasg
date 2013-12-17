@@ -15,23 +15,23 @@ public class MainTest_GA_LK {
 		
 		//Eil51 instance = new Eil51();
 		
-		//Pr152 instance = new Pr152();
+		Pr152 instance = new Pr152();
 		
 		//Rat195 instance = new Rat195();
 		
-		//Pr152 instance = new Pr152();
+		//Cities76 instance = new Cities76();
 		
 		//Pr1002 instance = new Pr1002();
 		
-		Fl3795 instance = new Fl3795();
+		//Fl3795 instance = new Fl3795();
 		
 		CityManager manager = new CityManager(instance.getCities(), 15);
 		
 		GA_LK_Tester tester = new GA_LK_Tester(instance, manager);
 		
-		tester.setTotalRuns(10);
+		tester.setTotalRuns(5);
 		
-		tester.setParam(10, 5, 25, 1000, 50, 15, 5, 15, 750);
+		tester.setParam(8, 4, 25, 1000, 30, 15, 5, 15, 1000);
 		
 		System.out.println("Start tests");
 		

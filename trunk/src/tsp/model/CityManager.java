@@ -81,6 +81,7 @@ public class CityManager {
 	private static int distance(City a, City b){
 		double xd = a.getX() - b.getX();
 		double yd = a.getY() - b.getY();
+		// FIXME: cambiare calcolo distanza
 		// TSPLIB requires a nearest-int rounding
 		return (int) Math.round(Math.sqrt(xd*xd + yd*yd));
 	}

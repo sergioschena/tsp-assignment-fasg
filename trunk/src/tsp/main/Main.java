@@ -1,4 +1,4 @@
-package tsp.initialsolution;
+package tsp.main;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -11,6 +11,8 @@ import java.util.StringTokenizer;
 import java.util.TreeMap;
 
 import Solution_Data_Structure.Array_solution;
+import tsp.initialsolution.Instance;
+import tsp.initialsolution.NearestNeighbor;
 import tsp.model.City;
 import tsp.model.CityManager;
 
@@ -50,6 +52,7 @@ public class Main {
     		Array_solution sol = new Array_solution(initialSolutionK, cm);
     		
     		// risoluzione dell'istanza
+    		
     		
     		
     		// fine risoluzione
