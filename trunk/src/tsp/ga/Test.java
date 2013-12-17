@@ -1,24 +1,11 @@
 package tsp.ga;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 
 import org.uncommons.maths.random.MersenneTwisterRNG;
-import org.uncommons.maths.random.PoissonGenerator;
-import org.uncommons.watchmaker.framework.CandidateFactory;
-import org.uncommons.watchmaker.framework.EvolutionaryOperator;
-import org.uncommons.watchmaker.framework.FitnessEvaluator;
-import org.uncommons.watchmaker.framework.SelectionStrategy;
-import org.uncommons.watchmaker.framework.TerminationCondition;
-import org.uncommons.watchmaker.framework.operators.EvolutionPipeline;
-import org.uncommons.watchmaker.framework.selection.StochasticUniversalSampling;
-import org.uncommons.watchmaker.framework.termination.GenerationCount;
 
 import tsp.model.City;
 import tsp.model.CityManager;
-import tsp.model.Solution;
-import tsp.tabusearch.TSSolution;
 
 /** Test class for tabu list features 
  * NOT NEEDED 
@@ -27,9 +14,14 @@ public class Test {
 	
 	public static void main(String[] args) {
 		
-		testGeneticSolver();
+		//testGeneticSolver();
 		//testGenetic();
 		//testGeneticHybridSolver();
+		testNewGenetic();
+	}
+	
+	private static void testNewGenetic(){
+		
 	}
 	
 	private static void testGeneticHybridSolver(){
@@ -49,6 +41,7 @@ public class Test {
 		int eliteCount = (int) (populationSize*0.2 + 0.5);
 		int generationCount = 10;
 		
+		/*
 		GeneticHybridSolver ghs = new GeneticHybridSolver(cityManager, K);
 		ghs.setParameters(populationSize, eliteCount, generationCount, maxGlobalIterations, maxIntensifierIterations, maxIntensifierNotImprovingIterations, startTenure);
 		TSSolution best = (TSSolution) ghs.explore();
@@ -57,6 +50,7 @@ public class Test {
 		System.out.println("Cost:"+best.length()+" - "+best);
 		System.out.println("Iterations: "+ghs.getIterations());
 		System.out.println((double)((end-start)/1000.0));
+		*/
 	}
 	
 	private static void testGenetic(){
@@ -70,7 +64,7 @@ public class Test {
 		int generationCount = 10;
 		
 		Random rng = new MersenneTwisterRNG();
-		
+		/*
 		CandidateFactory<TSSolution> candidateFactory = new ArrayCandidateFactory(cityManager,15);
 		
 		List<EvolutionaryOperator<TSSolution>> operators = new ArrayList<EvolutionaryOperator<TSSolution>>(2);
@@ -90,7 +84,7 @@ public class Test {
 		System.out.println("Cost:"+improved.length()+" - "+improved);
 		System.out.println("Iterations: "+ee.getIterations());
 		System.out.println((double)((end-start)/1000.0));
-		
+		*/
 	}
 	
 	private static void testGeneticSolver(){
@@ -102,6 +96,7 @@ public class Test {
 		end = System.currentTimeMillis();
 		System.out.println("done in "+((end-start)/1000.0)+" s");
 		
+		/*
 		int K = 15;
 		System.out.print("Initializing data structure... ");
 		start = System.currentTimeMillis();
@@ -118,7 +113,7 @@ public class Test {
 		System.out.println("done in "+((end-start)/1000.0)+" s");
 		System.out.println("Cost: "+sol.length()+" - "+sol);
 		System.out.println("Iterations: "+ghs.getIterations());
-		
+		*/
 	}
 		
 }

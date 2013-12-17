@@ -11,36 +11,39 @@ import org.uncommons.watchmaker.framework.CandidateFactory;
 
 import tsp.model.City;
 import tsp.model.CityManager;
-import tsp.tabusearch.TSSolution;
+import tsp.model.Solution;
 
-public class ArrayCandidateFactory implements CandidateFactory<TSSolution> {
+public class ArrayCandidateFactory implements CandidateFactory<Solution> {
 
 	private CityManager cityManager;
 	private int K = -1;
 	private City[] cities;
+	private Solution type;
 	
-	public ArrayCandidateFactory(CityManager cityManager){
+	public ArrayCandidateFactory(CityManager cityManager, Solution type){
 		this.cityManager = cityManager;
+		this.type = type;
 		cities = cityManager.getCities();
 	}
 	
-	public ArrayCandidateFactory(CityManager cityManager, int K){
+	public ArrayCandidateFactory(CityManager cityManager, Solution type, int K){
 		this.cityManager = cityManager;
+		this.type = type;
 		this.K = K;
 		cities = cityManager.getCities();
 	}
 	
 	@Override
-	public List<TSSolution> generateInitialPopulation(int populationSize,
+	public List<Solution> generateInitialPopulation(int populationSize,
 			Random rng) {
 		
 		return generateInitialPopulation(populationSize, null, rng);
 	}
 
 	@Override
-	public List<TSSolution> generateInitialPopulation(int populationSize,
-			Collection<TSSolution> seedCandidates, Random rng) {
-		ArrayList<TSSolution> candidate = new ArrayList<TSSolution>(100);
+	public List<Solution> generateInitialPopulation(int populationSize,
+			Collection<Solution> seedCandidates, Random rng) {
+		ArrayList<Solution> candidate = new ArrayList<Solution>(100);
 		
 		if(seedCandidates != null){
 			candidate.addAll(seedCandidates);
@@ -54,7 +57,7 @@ public class ArrayCandidateFactory implements CandidateFactory<TSSolution> {
 	}
 
 	@Override
-	public TSSolution generateRandomCandidate(Random rng) {
+	public Solution generateRandomCandidate(Random rng) {
 		
 		if(K > 0){
 			return kNearestCandidate(rng);
@@ -64,23 +67,21 @@ public class ArrayCandidateFactory implements CandidateFactory<TSSolution> {
 		
 	}
 	
-	private TSSolution randomCandidate(Random rng) {
+	private Solution randomCandidate(Random rng) {
 		int n = cityManager.n;
 		City[] sol = new City[n];
 		ArrayList<City> tmp = new ArrayList<City>(Arrays.asList(cities));
 		
 		Collections.shuffle(tmp,rng);
-		cities = tmp.toArray(sol);
+		sol = tmp.toArray(sol);
 		
-		return new TSSolution(sol);
+		return type.getSolutionFromCities(sol);
 	}
 	
-	private TSSolution kNearestCandidate(Random rng) {
+	private Solution kNearestCandidate(Random rng) {
 		City[] sol = new City[cities.length];
 		
-		for(int i=1; i<cities.length; i++ ){
-			cities[i].visited = false;
-		}
+		cityManager.clearVisited();
 		
 		sol[0] = cities[0];
 		sol[0].visited = true;
@@ -97,7 +98,7 @@ public class ArrayCandidateFactory implements CandidateFactory<TSSolution> {
 			sol[i].visited = true;
 		}		
 		
-		return new TSSolution(sol);
+		return type.getSolutionFromCities(sol);
 	}
 
 }

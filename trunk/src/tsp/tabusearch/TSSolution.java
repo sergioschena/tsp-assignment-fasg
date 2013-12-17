@@ -155,5 +155,11 @@ public class TSSolution implements Solution {
 	public int getSize() {
 		return size;
 	}
+
+	@Override
+	public void swap(City a, City b) {
+		// TODO Auto-generated method stub
+		
+	}
 	
 }
