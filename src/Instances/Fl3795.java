@@ -3820,7 +3820,7 @@ City[] cities = new City[3795];
 
 	@Override
 	public int getOptimum() {
-		return 259045;
+		return 28723;
 	}
 
 	@Override

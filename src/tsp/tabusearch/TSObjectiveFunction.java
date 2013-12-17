@@ -25,7 +25,7 @@ public class TSObjectiveFunction {
 			act = s.next(act);
 		}while(!act.equals(start));
 		
-		s.setLength(val);
+		//s.setLength(val);
 		
 		return val;
 	}

@@ -1,18 +1,12 @@
 package Parameters_Testers;
 
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.Random;
-
 import tsp.ga.GeneticHybridSolver;
 import tsp.model.City;
 import tsp.model.CityManager;
-import tsp.model.InitialSolutionGenerator;
-import tsp.tabusearch.TSSolution;
 import Instances.Instance;
 import Solution_Data_Structure.Array_solution;
 
-public class GA_TS_Tester implements Tester {
+public class GA_LK_Tester implements Tester {
 	
 	//istanza su cui si effettua il test
 	Instance tsp_instance;
@@ -27,11 +21,11 @@ public class GA_TS_Tester implements Tester {
 	
 	int[] tour_lengths;
 	
-	int min_tour_length;
+	int min_tour_length = Integer.MAX_VALUE;
 	
 	long best_solution_time;
 	
-	int max_tour_length;
+	int max_tour_length = 0;
 	
 	long[] solution_times;
 	
@@ -45,21 +39,22 @@ public class GA_TS_Tester implements Tester {
 //	Parametri
 //-------------------------------------------------------------------------------------
 	
-	int populationSize;
-	int eliteCount;
-	int generationCount;
-	int K;
+	private int populationSize;
+	private int eliteCount;
+	private int generationCount;
 	
-	int maxGlobalIterations;
-	int maxIntensifierIterations;
-	int maxIntensifierNotImprovingIterations;
-	int startTenure;
-		
+	private int maxGlobalIterations;
+	
+	private int max_t1;	
+	private int max_y1;	
+	private int max_y2;
+	private int max_yi;
+	private int max_lambda;	
 //-------------------------------------------------------------------------------------
 //	Costruttore e setter
 //-------------------------------------------------------------------------------------
 	
-	public GA_TS_Tester(Instance tsp_instance, CityManager manager){
+	public GA_LK_Tester(Instance tsp_instance, CityManager manager){
 		this.tsp_instance = tsp_instance;
 		this.manager = manager;
 	}
@@ -70,17 +65,18 @@ public class GA_TS_Tester implements Tester {
 	}
 	
 	//metodo per configurare i parametri dell'algoritmo LK
-	public void setParam(int populationSize, int eliteCount, int generationCount, int maxGlobalIterations, int maxIntensifierIterations,
-			int maxIntensifierNotImprovingIterations,
-			int startTenure){
+	public void setParam(int populationSize, int eliteCount, int generationCount, int maxGlobalIterations, int max_t1, int max_y1, int max_y2, int max_yi, int max_lambda){
 		this.populationSize = populationSize;
 		this.eliteCount = eliteCount;
 		this.generationCount = generationCount;
 		
 		this.maxGlobalIterations = maxGlobalIterations;
-		this.maxIntensifierIterations = maxIntensifierIterations;
-		this.maxIntensifierNotImprovingIterations = maxIntensifierNotImprovingIterations;
-		this.startTenure = startTenure;
+		
+		this.max_t1 = max_t1;
+		this.max_y1 = max_y1;
+		this.max_y2 = max_y2;
+		this.max_yi = max_yi;
+		this.max_lambda = max_lambda;
 	}
 	
 //-------------------------------------------------------------------------------------
@@ -127,26 +123,27 @@ public class GA_TS_Tester implements Tester {
 			//tempo impiegato per costruire un esploratore/intensificatore
 			long start_explorer = System.currentTimeMillis();
 			
-			//GeneticHybridSolver explorer = new GeneticHybridSolver(manager, K);
+			GeneticHybridSolver explorer = new GeneticHybridSolver(manager, 15, solution);
 			
 			explorer_times[i] = System.currentTimeMillis() - start_explorer;
 			
 			//configurazione dell'esploratore
 			//explorer.setParameters(populationSize, eliteCount, generationCount, maxGlobalIterations, 
 			//		maxIntensifierIterations, maxIntensifierNotImprovingIterations, startTenure);
-			
+			explorer.setParameters(populationSize, eliteCount, generationCount, maxGlobalIterations, max_t1, max_y1, max_y2, max_yi, max_lambda);			
 			
 			//tempo impiegato per l'esplorazione
 			long start_exploring = System.currentTimeMillis();
 			
 			//TSSolution best_solution = (TSSolution) explorer.explore();
+			Array_solution best_solution = (Array_solution) explorer.explore(); 
 			
 			//TwoLevelTree best_solution = (TwoLevelTree) explorer.explore();
 			
 			exploring_times[i] = System.currentTimeMillis() - start_exploring;
 			
 			//lunghezza della soluzione ottenuta
-			//tour_lengths[i] = best_solution.length();
+			tour_lengths[i] = best_solution.length();
 			
 			if(tour_lengths[i]<min_tour_length){
 				min_tour_length = tour_lengths[i];

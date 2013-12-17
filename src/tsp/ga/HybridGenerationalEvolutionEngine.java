@@ -24,63 +24,73 @@ import tsp.model.CityManager;
 import tsp.model.Solution;
 import tsp.tabusearch.AspirationCriteria;
 import tsp.tabusearch.BestEverAspirationCriteria;
-import tsp.tabusearch.TSSolution;
-import tsp.tabusearch.TabuSearch;
+import LK.LK_Intesifier;
 
 public class HybridGenerationalEvolutionEngine implements
-		EvolutionEngine<TSSolution>,TerminationCondition {
+		EvolutionEngine<Solution>,TerminationCondition {
 
-	private final Set<EvolutionObserver<? super TSSolution>> observers = new CopyOnWriteArraySet<EvolutionObserver<? super TSSolution>>();
+	private final Set<EvolutionObserver<? super Solution>> observers = new CopyOnWriteArraySet<EvolutionObserver<? super Solution>>();
 
 	private final Random rng;
-	private final CandidateFactory<TSSolution> candidateFactory;
-	private final FitnessEvaluator<? super TSSolution> fitnessEvaluator;
-	private final EvolutionaryOperator<TSSolution> evolutionScheme;
-    private final SelectionStrategy<? super TSSolution> selectionStrategy;
+	private final CandidateFactory<Solution> candidateFactory;
+	private final FitnessEvaluator<? super Solution> fitnessEvaluator;
+	private final EvolutionaryOperator<Solution> evolutionScheme;
+    private final SelectionStrategy<? super Solution> selectionStrategy;
     
     private final CityManager cityManager;
     private final static AspirationCriteria aspirationCriteria = BestEverAspirationCriteria.getInstance();
     
-    private int startTenure = 5;
-	private int maxIntensifierIterations = 50;
-	private int maxIntensifierNotImprovingIterations = 5;
-	
+    private LK_Intesifier intensifier;
+    
+    private int max_t1;
+    private int max_y1;
+    private int max_y2;
+	private int max_yi;
+	private int max_lambda;
+
 	private int maxGlobalIterations;
 	private int iterations;
 	
 	private List<TerminationCondition> satisfiedTerminationConditions;
 
-	public HybridGenerationalEvolutionEngine(CandidateFactory<TSSolution> candidateFactory, EvolutionaryOperator<TSSolution> evolutionScheme, 
-			FitnessEvaluator<? super TSSolution> fitnessEvaluator, SelectionStrategy<? super TSSolution>selectionStrategy, Random rng, CityManager cityManager) {
+	public HybridGenerationalEvolutionEngine(CandidateFactory<Solution> candidateFactory, EvolutionaryOperator<Solution> evolutionScheme, 
+			FitnessEvaluator<? super Solution> fitnessEvaluator, SelectionStrategy<? super Solution>selectionStrategy, Random rng, CityManager cityManager) {
 		this.candidateFactory = candidateFactory;
 		this.evolutionScheme = evolutionScheme;
 		this.fitnessEvaluator = fitnessEvaluator;
 		this.selectionStrategy = selectionStrategy;
 		this.rng = rng;
 		this.cityManager = cityManager;
+		
+		intensifier = new LK_Intesifier(this.cityManager);
 	}
 	
-	public void setParameters(int maxGlobalIterations, int maxIntensifierIterations, int maxIntensifierNotImprovingIterations, int startTenure){
+	public void setParameters(int maxGlobalIterations, int max_t1, int max_y1, int max_y2, int max_yi, int max_lambda){
 		this.maxGlobalIterations = maxGlobalIterations;
-		this.maxIntensifierIterations = maxIntensifierIterations;
-		this.maxIntensifierNotImprovingIterations = maxIntensifierNotImprovingIterations;
-		this.startTenure = startTenure;
+		
+		this.max_t1 = max_t1;
+		this.max_y1 = max_y1;
+		this.max_y2 = max_y2;
+		this.max_yi = max_yi;
+		this.max_lambda = max_lambda;
+		
+		intensifier.setParam(max_t1, max_y1, max_y2, max_yi, max_lambda);
 	}
 
-	public TSSolution evolve(int populationSize, int eliteCount, TerminationCondition... conditions) {
-		return evolve(populationSize, eliteCount, Collections.<TSSolution> emptySet(), conditions);
+	public Solution evolve(int populationSize, int eliteCount, TerminationCondition... conditions) {
+		return evolve(populationSize, eliteCount, Collections.<Solution> emptySet(), conditions);
 	}
 
-	public TSSolution evolve(int populationSize, int eliteCount, Collection<TSSolution> seedCandidates, TerminationCondition... conditions) {
+	public Solution evolve(int populationSize, int eliteCount, Collection<Solution> seedCandidates, TerminationCondition... conditions) {
 		return evolvePopulation(populationSize, eliteCount, seedCandidates, conditions).get(0).getCandidate();
 	}
 
-	public List<EvaluatedCandidate<TSSolution>> evolvePopulation(int populationSize, int eliteCount, TerminationCondition... conditions) {
-		return evolvePopulation(populationSize, eliteCount, Collections.<TSSolution> emptySet(), conditions);
+	public List<EvaluatedCandidate<Solution>> evolvePopulation(int populationSize, int eliteCount, TerminationCondition... conditions) {
+		return evolvePopulation(populationSize, eliteCount, Collections.<Solution> emptySet(), conditions);
 	}
 
 	@Override
-	public List<EvaluatedCandidate<TSSolution>> evolvePopulation(int populationSize, int eliteCount, Collection<TSSolution> seedCandidates, TerminationCondition... conditions) {
+	public List<EvaluatedCandidate<Solution>> evolvePopulation(int populationSize, int eliteCount, Collection<Solution> seedCandidates, TerminationCondition... conditions) {
 		if (eliteCount < 0){
 			eliteCount = 1; 
 		}else if(eliteCount >= populationSize){
@@ -95,14 +105,14 @@ public class HybridGenerationalEvolutionEngine implements
 		int currentGenerationIndex = 0;
 		long startTime = System.currentTimeMillis();
 
-		List<TSSolution> population = candidateFactory.generateInitialPopulation(populationSize, seedCandidates, rng);
+		List<Solution> population = candidateFactory.generateInitialPopulation(populationSize, seedCandidates, rng);
 
 		// Calculate the fitness scores for each member of the initial
 		// population.
 		
-		List<EvaluatedCandidate<TSSolution>> evaluatedPopulation = evaluatePopulation(population);
+		List<EvaluatedCandidate<Solution>> evaluatedPopulation = evaluatePopulation(population);
 		EvolutionUtils.sortEvaluatedPopulation(evaluatedPopulation,fitnessEvaluator.isNatural());
-		PopulationData<TSSolution> data = EvolutionUtils.getPopulationData(evaluatedPopulation, fitnessEvaluator.isNatural(), eliteCount,
+		PopulationData<Solution> data = EvolutionUtils.getPopulationData(evaluatedPopulation, fitnessEvaluator.isNatural(), eliteCount,
 				currentGenerationIndex, startTime);
 		// Notify observers of the state of the population.
 		notifyPopulationChange(data);
@@ -122,12 +132,12 @@ public class HybridGenerationalEvolutionEngine implements
 		return evaluatedPopulation;
 	}
 
-	protected List<EvaluatedCandidate<TSSolution>> nextEvolutionStep(List<EvaluatedCandidate<TSSolution>> evaluatedPopulation, int eliteCount, Random rng) {
-		List<TSSolution> population = new ArrayList<TSSolution>(evaluatedPopulation.size());
+	protected List<EvaluatedCandidate<Solution>> nextEvolutionStep(List<EvaluatedCandidate<Solution>> evaluatedPopulation, int eliteCount, Random rng) {
+		List<Solution> population = new ArrayList<Solution>(evaluatedPopulation.size());
 
 		// First perform any elitist selection.
-		List<TSSolution> elite = new ArrayList<TSSolution>(eliteCount);
-		Iterator<EvaluatedCandidate<TSSolution>> iterator = evaluatedPopulation.iterator();
+		List<Solution> elite = new ArrayList<Solution>(eliteCount);
+		Iterator<EvaluatedCandidate<Solution>> iterator = evaluatedPopulation.iterator();
 		while (elite.size() < eliteCount) {
 			elite.add(iterator.next().getCandidate());
 		}
@@ -142,22 +152,17 @@ public class HybridGenerationalEvolutionEngine implements
 		return evaluatePopulation(population);
 	}
 
-	protected List<EvaluatedCandidate<TSSolution>> evaluatePopulation(List<TSSolution> population) {
+	protected List<EvaluatedCandidate<Solution>> evaluatePopulation(List<Solution> population) {
 
-		final TabuSearch ts = new TabuSearch(cityManager, aspirationCriteria, startTenure, maxIntensifierNotImprovingIterations, maxIntensifierIterations);
+		
+		List<EvaluatedCandidate<Solution>> evaluatedPopulation = new ArrayList<EvaluatedCandidate<Solution>>(population.size());
 
-		List<EvaluatedCandidate<TSSolution>> evaluatedPopulation = new ArrayList<EvaluatedCandidate<TSSolution>>(population.size());
-
-		for (TSSolution candidate : population){
+		for (Solution candidate : population){
 			if((this.maxGlobalIterations-this.iterations) > 0){
-				if((this.maxGlobalIterations-this.iterations) < this.maxIntensifierIterations){
-					ts.setParams(startTenure, maxIntensifierNotImprovingIterations, this.maxGlobalIterations-this.iterations);
-				}
-				Solution improved = ts.improve(candidate);
-				candidate = (TSSolution) improved;       	
-				this.iterations += ts.iterations;
+					candidate = intensifier.improve(candidate);
+					this.iterations += max_t1;
 			}
-			evaluatedPopulation.add(new EvaluatedCandidate<TSSolution>(candidate, candidate.length()));
+			evaluatedPopulation.add(new EvaluatedCandidate<Solution>(candidate, candidate.length()));
 		}
 
 		return evaluatedPopulation;
@@ -173,17 +178,17 @@ public class HybridGenerationalEvolutionEngine implements
 	}
 
 	@Override
-	public void addEvolutionObserver(EvolutionObserver<? super TSSolution> observer) {
+	public void addEvolutionObserver(EvolutionObserver<? super Solution> observer) {
 		observers.add(observer);
 	}
 
 	@Override
-	public void removeEvolutionObserver(EvolutionObserver<? super TSSolution> observer) {
+	public void removeEvolutionObserver(EvolutionObserver<? super Solution> observer) {
 		observers.remove(observer);
 	}
 	
-	private void notifyPopulationChange(PopulationData<TSSolution> data) {
-		for (EvolutionObserver<? super TSSolution> observer : observers) {
+	private void notifyPopulationChange(PopulationData<Solution> data) {
+		for (EvolutionObserver<? super Solution> observer : observers) {
 			observer.populationUpdate(data);
 		}
 	}

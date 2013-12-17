@@ -5,9 +5,9 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Random;
 
-import Initial_Solution.NearestNeighbor;
 import LK.LK_Intesifier;
 import Two_Level_Tree.TwoLevelTree;
+import tsp.initialsolution.NearestNeighbor;
 import tsp.model.*;
 
 public class Test_PSO {
