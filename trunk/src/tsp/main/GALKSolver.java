@@ -2,24 +2,22 @@ package tsp.main;
 
 import java.util.Map;
 
+import Solution_Data_Structure.Array_solution;
 import tsp.ga.GeneticHybridSolver;
+import tsp.initialsolution.Instance;
 import tsp.model.CityManager;
 import tsp.model.Solution;
-import Instances.Instance;
-import Solution_Data_Structure.Array_solution;
 
 public class GALKSolver {
 	
-	Instance tspInstance;	
-	CityManager manager;	
-	int repetitions = 10;	
+	private Instance tspInstance;	
+	//CityManager manager;	
+	private int repetitions = 10;
+	private int K = 15;
 	
-	long[] exploringTimes;	
-	long[] improvingTimes;
-	long[] solutionTimes;	
-	long[] initialSolutionTimes;	
+	long[] exploringTimes;
+	long[] solutionTimes;		
 	long[] explorerTimes;	
-	long[] intensifierTimes;	
 	
 	int[] tourLengths;	
 	int minTourLength = Integer.MAX_VALUE;	
@@ -40,12 +38,11 @@ public class GALKSolver {
 	private int max_y2;
 	private int max_yi;
 	private int max_lambda;	
-	
-	private Solution type;
 
-	public GALKSolver(Instance tsp_instance, CityManager manager, Solution type){
+	public GALKSolver(Instance tsp_instance, int K){
 		this.tspInstance = tsp_instance;
-		this.manager = manager;
+		this.K = K;
+		//this.manager = manager;
 	}
 	
 	public void setTotalRuns(int runs_number) {
@@ -63,7 +60,10 @@ public class GALKSolver {
 		int maxYi = (int) Double.parseDouble(params.get("LKMaxYi"));
 		int maxLambda = (int) Double.parseDouble(params.get("LKMaxLambda"));
 		
+		int repetions = (int) Double.parseDouble(params.get("Repetitions"));
+		
 		setParam(populationSize, eliteCount, generationCount, maxGlobalIterations, maxT1, maxY1, maxY2, maxYi, maxLambda);
+		setTotalRuns(repetions);
 	}
 	
 	public void setParam(int populationSize, int eliteCount, int generationCount, int maxGlobalIterations, 
@@ -83,9 +83,7 @@ public class GALKSolver {
 	
 	public void solve() {
 		
-		initialSolutionTimes = new long[repetitions];
-		solutionTimes = new long[repetitions];
-		intensifierTimes = new long[repetitions];
+		solutionTimes = new long[repetitions];		
 		explorerTimes = new long[repetitions];
 		exploringTimes = new long[repetitions];
 		tourLengths = new int[repetitions];
@@ -95,23 +93,14 @@ public class GALKSolver {
 		
 		for(int i = 0; i<repetitions; i++){
 			
-			// FIXME: serve???
-			//tempo impiegato nella costruzione della prima soluzione
-			long start_init_sol = System.currentTimeMillis();
-			
-			initialSolutionTimes[i] = System.currentTimeMillis() - start_init_sol;
-			
-			// FIXME: serve???
-			//tempo impiegato per creare una soluzione
-			long start_sol = System.currentTimeMillis();
-			
-			solutionTimes[i] = System.currentTimeMillis() - start_sol;
-			
 			//tempo impiegato per costruire un esploratore/intensificatore
-			long start_explorer = System.currentTimeMillis();
+			long start_time = System.currentTimeMillis();
 			
-			GeneticHybridSolver explorer = new GeneticHybridSolver(manager, 15, type);			
-			explorerTimes[i] = System.currentTimeMillis() - start_explorer;
+			CityManager manager = new CityManager(tspInstance.getCitiesArr(), K);			
+			Solution type = new Array_solution(tspInstance.getCitiesArr(), manager);
+			GeneticHybridSolver explorer = new GeneticHybridSolver(manager, K, type);			
+			
+			explorerTimes[i] = System.currentTimeMillis() - start_time;
 			
 			//configurazione dell'esploratore
 			explorer.setParameters(populationSize, eliteCount, generationCount, maxGlobalIterations, max_t1, max_y1, max_y2, max_yi, max_lambda);			
@@ -119,16 +108,18 @@ public class GALKSolver {
 			//tempo impiegato per l'esplorazione
 			long start_exploring = System.currentTimeMillis();
 			
-			Array_solution best_solution = (Array_solution) explorer.explore();
+			Solution best_solution = explorer.explore();
 			
-			exploringTimes[i] = System.currentTimeMillis() - start_exploring;
+			long end_exploring = System.currentTimeMillis();
+			exploringTimes[i] = end_exploring - start_exploring;
+			solutionTimes[i] = end_exploring - start_time;
 			
 			//lunghezza della soluzione ottenuta
 			tourLengths[i] = best_solution.length();
 			
 			if(tourLengths[i]<minTourLength){
 				minTourLength = tourLengths[i];
-				bestSolutionTime = exploringTimes[i];
+				bestSolutionTime = solutionTimes[i];
 				bestSolution = best_solution;
 				
 			}
@@ -138,8 +129,6 @@ public class GALKSolver {
 			
 		}
 		
-		
-
 	}
 	
 	public long getAVGExploringTime() {
@@ -151,17 +140,6 @@ public class GALKSolver {
 			avg += l;
 		
 		return avg/(long)exploringTimes.length;
-	}
-
-	public long getAVGImprovingTime() {
-		if(improvingTimes.length==0)
-			return -1;
-		
-		long avg = 0;
-		for(Long l : improvingTimes)
-			avg += l;
-		
-		return avg/(long)improvingTimes.length;
 	}
 
 	public int getAVGTourLength() {
@@ -189,19 +167,6 @@ public class GALKSolver {
 		return maxTourLength;
 	}
 
-	// FIXME: eliminare
-	public double getErrorFromOptimum() {
-		double avg = (double)getAVGTourLength();
-		if(avg<0)
-			return -1;
-		
-		double opt = (double)tspInstance.getOptimum();
-		
-		double diff = avg - opt;
-		
-		return diff/opt;
-	}
-
 	public long getAVGSolutionTime() {
 		if(solutionTimes.length==0)
 			return -1;
@@ -213,17 +178,6 @@ public class GALKSolver {
 		return avg/(long)solutionTimes.length;
 	}
 
-	public long getAVGInitialSolutionTime() {
-		if(initialSolutionTimes.length==0)
-			return -1;
-		
-		long avg = 0;
-		for(Long l : initialSolutionTimes)
-			avg += l;
-		
-		return avg/(long)initialSolutionTimes.length;
-	}
-
 	public long getAVGExplorerConstructionTime() {
 		if(explorerTimes.length==0)
 			return -1;
@@ -233,30 +187,6 @@ public class GALKSolver {
 			avg += l;
 		
 		return avg/(long)explorerTimes.length;
-	}
-
-	public long getAVGIntensifierTime() {
-		if(intensifierTimes.length==0)
-			return -1;
-		
-		long avg = 0;
-		for(Long l : intensifierTimes)
-			avg += l;
-		
-		return avg/(long)intensifierTimes.length;
-	}
-
-	//FIXME: eliminare
-	public double getMINErrorFromOptimum() {
-		double min = (double)getMINTourLength();
-		if(min<0)
-			return -1;
-		
-		double opt = (double)tspInstance.getOptimum();
-		
-		double diff = min - opt;
-		
-		return diff/opt;
 	}
 
 	public long getTimeofBestSolution() {

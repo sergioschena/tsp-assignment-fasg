@@ -1,0 +1,19 @@
+PARAMS
+DataFileDir C:/Users/Sergio/Documents/Data
+GAMaxGlobalIterations 1000
+Repetitions 10
+GAPopulationSize 10
+GAEliteCount 5
+GAGenerationCount 10
+LKMaxT1 50
+LKMaxY1 15
+LKMaxY2 5
+LKMaxYi 15
+LKMaxLambda 1000 
+ENDPARAMS
+INSTANCES
+berlin52.tsp
+eil51.tsp
+eil76.tsp
+ENDINSTANCES
+EOF

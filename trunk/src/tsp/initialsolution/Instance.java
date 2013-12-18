@@ -17,8 +17,8 @@ import tsp.model.Solution;
  */
 public class Instance {
 	
-	private static final String TSP_EXTENSION = ".tsp";
-	private static final String OPT_TOUR_EXTENSION = ".opt.tour";
+	public static final String TSP_EXTENSION = ".tsp";
+	public static final String OPT_TOUR_EXTENSION = ".opt.tour";
 	
 	public String fileName;
 	public String directory;
@@ -35,7 +35,7 @@ public class Instance {
 		}
 		
 		this.fileName = file;
-		System.out.println("Apertura file istanze: " + this.directory + this.fileName);
+		System.out.println("Opening instance file: " + this.directory + this.fileName);
 		
 		try{
 			File input = new File(directory+fileName);
@@ -73,6 +73,7 @@ public class Instance {
 				throw new IllegalArgumentException("Error while reading the input file: EOF Section");
 			}
 			br.close();
+			System.out.println("File read successfully");
 		}
 		catch (Exception e) {
 			e.printStackTrace();
@@ -91,6 +92,8 @@ public class Instance {
 		try {
 			bw = new BufferedWriter(new FileWriter(file));
 			
+			System.out.println("Writing tour file: " + tspName);
+			
 			bw.write("NAME : "+ tspName + OPT_TOUR_EXTENSION + "\n");
 			bw.write("COMMENT : Optimal tour for "+ tspName + TSP_EXTENSION + " (" + opt.length() + ")" + "\n");
 			bw.write("TYPE : TOUR\n");
@@ -107,6 +110,7 @@ public class Instance {
 			bw.write("-1\n");
 			bw.write("EOF\n");
 			bw.close();
+			System.out.println("File written successfully");
 		} catch (IOException e) {
 			e.printStackTrace();
 			System.out.println("Error "+e.getMessage());

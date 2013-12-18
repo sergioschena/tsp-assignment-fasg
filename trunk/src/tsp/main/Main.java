@@ -1,20 +1,19 @@
 package tsp.main;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.TreeMap;
 
-import Solution_Data_Structure.Array_solution;
 import tsp.initialsolution.Instance;
-import tsp.initialsolution.NearestNeighbor;
-import tsp.model.City;
-import tsp.model.CityManager;
+import Solution_Data_Structure.Array_solution;
 
 public class Main {
 	
@@ -24,6 +23,7 @@ public class Main {
 	
 	private static final String FILE_PARAM = "./param.txt";
 	private static final String DATA_DIR_PARAM = "DataFileDir";
+	private static final String RESULTS_FILE = "./results.csv";
 	
 	private static final Map<String, String> paramsMap = new TreeMap<String, String>();
 	private static final LinkedList<String> istancesNames = new LinkedList<String>();
@@ -34,30 +34,76 @@ public class Main {
     	readParamFile(args); //oppure si passa arg[0]
     	
     	String dirName = paramsMap.get(DATA_DIR_PARAM);
-       	
+    	int K = 15; //numero citta' vicine da considerare
+    	final File resultsFile = new File(RESULTS_FILE);
+		
+		BufferedWriter bw = null;
+		
+		try {
+			bw = new BufferedWriter(new FileWriter(resultsFile));
+			
+			bw.write("Instance;Best sol;Mean sol;Min sol;Max sol;Time Best;Time mean;Best known\n");
+			
+		} catch (IOException e) {
+			System.err.println("Unable to create results file \"" + RESULTS_FILE + "\".");
+			e.printStackTrace();
+		}
     	//lettura dei file delle istanze:
     	for(int i=0; i<istancesNames.size(); i++){ //prima istanza e' dirName
+    		StringBuffer csvLine = new StringBuffer();
+    		Instance instance = new Instance(dirName, istancesNames.get(i));
     		
-    		Instance inst = new Instance(dirName, istancesNames.get(i));
+    		// risoluzione dell'istanza    		
+    		GALKSolver solver = new GALKSolver(instance, K);
+    		solver.setParamByMap(paramsMap);
+    		solver.solve();
+    		Array_solution optimum = (Array_solution) solver.bestSolution;
+    		// fine risoluzione    		
+    		instance.createOptTourFile(optimum);
     		
-    		int k = 15; //numero citta' vicine da considerare
-    		CityManager cm = new CityManager(inst.getCitiesArr(), k);
-    		NearestNeighbor nn = new NearestNeighbor(cm);
+    		if(bw != null){
+    			csvLine.append(instance.fileName.substring(0, instance.fileName.indexOf(Instance.TSP_EXTENSION)));
+    			csvLine.append(";");
+    			csvLine.append(solver.getMINTourLength());
+    			csvLine.append(";");
+    			csvLine.append(solver.getAVGTourLength());
+    			csvLine.append(";");
+    			csvLine.append(solver.getMINTourLength());
+    			csvLine.append(";");
+    			csvLine.append(solver.getMAXTourLength());
+    			csvLine.append(";");
+    			csvLine.append(solver.getTimeofBestSolution()/1000.0);
+    			csvLine.append(";");
+    			csvLine.append(solver.getAVGSolutionTime()/1000.0);
+    			csvLine.append(";\n");
+    			
+    			try {
+					bw.write(csvLine.toString());
+				} catch (IOException e) {
+					System.err.println("Unable to write a line in \"" + RESULTS_FILE + "\"");
+					e.printStackTrace();
+				}
+    		}
     		
-    		City[] initialSolutionK = nn.generate(k); 
-    		cm.clearVisited();
+    		System.out.println("Instance name: "+instance.fileName);
+    		System.out.println("Avg length: "+solver.getAVGTourLength());
+    		System.out.println("Worst length: "+solver.getMAXTourLength());
+    		System.out.println("Best length: "+solver.getMINTourLength());
+    		System.out.println("Avg exploring time: "+solver.getAVGExploringTime());
+    		System.out.println("Avg explorer construction time: "+solver.getAVGExplorerConstructionTime());
+    		System.out.println("Best solution solve time: "+solver.getTimeofBestSolution());    		
     		
-    		System.out.println(nn.toString());
-    		
-    		Array_solution sol = new Array_solution(initialSolutionK, cm);
-    		
-    		// risoluzione dell'istanza
-    		
-    		
-    		
-    		// fine risoluzione
-    		
-    		inst.createOptTourFile(sol);
+    		System.out.println("\n ------------------------------------------------------------ \n");
+
+    	}
+    	
+    	if(bw != null){
+    		try {
+				bw.close();
+			} catch (IOException e) {
+				System.err.println("Unable to close \"" + RESULTS_FILE + "\"");
+				e.printStackTrace();
+			}
     	}
 	}
 	
