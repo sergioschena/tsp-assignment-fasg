@@ -19,8 +19,11 @@ public class GA_LK_ParamTester {
 		
 		instances.add(new Berlin52());
 		instances.add(new Eil51());
-		
-		//instances.add(new Pr1002());
+		instances.add(new Cities10());
+		instances.add(new Cities76());
+		instances.add(new Pr152());
+		instances.add(new Rat195());
+		instances.add(new Pr1002());
 		
 		//bisogna effettuare i test sul numero di interne e sulla numerosità della
 		//popolazione
