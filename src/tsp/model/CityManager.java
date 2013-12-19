@@ -12,8 +12,6 @@ public class CityManager {
 	public int n;
 	private int maxNeighbors;
 	
-	private City[][] nearestNew;
-	
 	public CityManager(City[] cities){
 		this(cities,cities.length-1);
 	}

@@ -7,6 +7,7 @@ import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.text.NumberFormat;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.StringTokenizer;
@@ -38,7 +39,7 @@ public class Main {
     	final File resultsFile = new File(RESULTS_FILE);
 		
 		BufferedWriter bw = null;
-		
+		NumberFormat nf = NumberFormat.getInstance();
 		try {
 			bw = new BufferedWriter(new FileWriter(resultsFile));
 			
@@ -72,9 +73,9 @@ public class Main {
     			csvLine.append(";");
     			csvLine.append(solver.getMAXTourLength());
     			csvLine.append(";");
-    			csvLine.append(solver.getTimeofBestSolution()/1000.0);
+    			csvLine.append(nf.format(solver.getTimeofBestSolution()/1000.0));
     			csvLine.append(";");
-    			csvLine.append(solver.getAVGSolutionTime()/1000.0);
+    			csvLine.append(nf.format(solver.getAVGSolutionTime()/1000.0));
     			csvLine.append(";\n");
     			
     			try {
@@ -90,8 +91,8 @@ public class Main {
     		System.out.println("Worst length: "+solver.getMAXTourLength());
     		System.out.println("Best length: "+solver.getMINTourLength());
     		System.out.println("Avg exploring time: "+solver.getAVGExploringTime());
-    		System.out.println("Avg explorer construction time: "+solver.getAVGExplorerConstructionTime());
-    		System.out.println("Best solution solve time: "+solver.getTimeofBestSolution());    		
+    		System.out.println("Avg explorer construction time: "+nf.format(solver.getAVGExplorerConstructionTime()/1000.0));
+    		System.out.println("Best solution solve time: "+nf.format(solver.getTimeofBestSolution()/1000.0));    		
     		
     		System.out.println("\n ------------------------------------------------------------ \n");
 
