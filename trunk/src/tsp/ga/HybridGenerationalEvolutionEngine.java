@@ -20,11 +20,11 @@ import org.uncommons.watchmaker.framework.PopulationData;
 import org.uncommons.watchmaker.framework.SelectionStrategy;
 import org.uncommons.watchmaker.framework.TerminationCondition;
 
+import tsp.lk.LKIntesifier;
 import tsp.model.CityManager;
 import tsp.model.Solution;
 import tsp.tabusearch.AspirationCriteria;
 import tsp.tabusearch.BestEverAspirationCriteria;
-import LK.LK_Intesifier;
 
 public class HybridGenerationalEvolutionEngine implements
 		EvolutionEngine<Solution>,TerminationCondition {
@@ -40,7 +40,7 @@ public class HybridGenerationalEvolutionEngine implements
     private final CityManager cityManager;
     private final static AspirationCriteria aspirationCriteria = BestEverAspirationCriteria.getInstance();
     
-    private LK_Intesifier intensifier;
+    private LKIntesifier intensifier;
     
     private int max_t1;
     private int max_y1;
@@ -62,7 +62,7 @@ public class HybridGenerationalEvolutionEngine implements
 		this.rng = rng;
 		this.cityManager = cityManager;
 		
-		intensifier = new LK_Intesifier(this.cityManager);
+		intensifier = new LKIntesifier(this.cityManager);
 	}
 	
 	public void setParameters(int maxGlobalIterations, int max_t1, int max_y1, int max_y2, int max_yi, int max_lambda){
