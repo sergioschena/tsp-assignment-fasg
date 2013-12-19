@@ -4,8 +4,8 @@ import java.util.Random;
 
 import org.uncommons.maths.random.MersenneTwisterRNG;
 
-import LK.LK_Intesifier;
 import tsp.ga.KnownInstances;
+import tsp.lk.LKIntesifier;
 import tsp.model.City;
 import tsp.model.CityManager;
 import tsp.model.Solution;

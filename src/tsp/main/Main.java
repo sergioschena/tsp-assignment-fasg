@@ -12,8 +12,8 @@ import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.TreeMap;
 
+import tsp.data.array.ArraySolution;
 import tsp.initialsolution.Instance;
-import Solution_Data_Structure.Array_solution;
 
 public class Main {
 	
@@ -57,7 +57,7 @@ public class Main {
     		GALKSolver solver = new GALKSolver(instance, K);
     		solver.setParamByMap(paramsMap);
     		solver.solve();
-    		Array_solution optimum = (Array_solution) solver.bestSolution;
+    		ArraySolution optimum = (ArraySolution) solver.bestSolution;
     		// fine risoluzione    		
     		instance.createOptTourFile(optimum);
     		

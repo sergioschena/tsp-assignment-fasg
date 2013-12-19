@@ -2,7 +2,7 @@ package tsp.main;
 
 import java.util.Map;
 
-import Solution_Data_Structure.Array_solution;
+import tsp.data.array.ArraySolution;
 import tsp.ga.GeneticHybridSolver;
 import tsp.initialsolution.Instance;
 import tsp.model.CityManager;
@@ -97,7 +97,7 @@ public class GALKSolver {
 			long start_time = System.currentTimeMillis();
 			
 			CityManager manager = new CityManager(tspInstance.getCitiesArr(), K);			
-			Solution type = new Array_solution(tspInstance.getCitiesArr(), manager);
+			Solution type = new ArraySolution(tspInstance.getCitiesArr(), manager);
 			GeneticHybridSolver explorer = new GeneticHybridSolver(manager, K, type);			
 			
 			explorerTimes[i] = System.currentTimeMillis() - start_time;
