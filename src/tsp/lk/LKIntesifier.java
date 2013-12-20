@@ -41,7 +41,7 @@ public class LKIntesifier implements Intensifier {
 	private HashSet<Edge> added_Edges;
 	
 	//numero di scambi effettuati per ottenere l'ultima soluzione migliore
-	private int k;
+	//private int k;
 	
 	//insieme degli archi x
 	private Edge[] x_Edges;
@@ -130,10 +130,7 @@ public class LKIntesifier implements Intensifier {
 			best_gain = 0;
 			
 			//numero di archi scambiati azzerato
-			k = 0;
-			
-			//TODO valutare se eseguire un clear() sugli ArrayList è più veloce di
-			//ricostruirli
+			//k = 0;
 			
 			//il set di archi aggiunti è vuoto
 			added_Edges = new HashSet<Edge>();
@@ -243,7 +240,7 @@ public class LKIntesifier implements Intensifier {
 							best_gain = G2_star;
 							
 							//aggiorna il numero di archi scambati
-							k = 2;
+							//k = 2;
 							
 							//non c'è bisogno di fare backtrack
 							backtrack = false;
@@ -292,7 +289,7 @@ public class LKIntesifier implements Intensifier {
 							Edge y2 = pair2.edge;
 							
 							//guadagno g2
-							int g2 = pair2.gain;
+							//int g2 = pair2.gain;
 							
 							//guadagno parziale G2
 							int G2 = pair2.part_gain;
@@ -309,7 +306,7 @@ public class LKIntesifier implements Intensifier {
 							Edge yi = y2;
 							
 							//guadagno gi
-							int gi = g2;
+							//int gi = g2;
 							
 							//Guadagno parziale Gi
 							int Gi = G2;
@@ -355,7 +352,7 @@ public class LKIntesifier implements Intensifier {
 									best_gain = Gi_star;
 									
 									//aggiorna il numero di archi scambati
-									k = i;
+									//k = i;
 									
 									//non c'è bisogno di fare backtrack
 									backtrack = false;
@@ -373,7 +370,7 @@ public class LKIntesifier implements Intensifier {
 									yi = yi_pair.edge;
 									
 									//guadagno gi
-									gi = yi_pair.gain;
+									//gi = yi_pair.gain;
 									
 									//guadagno parziale Gi
 									Gi = yi_pair.part_gain;
@@ -403,7 +400,6 @@ public class LKIntesifier implements Intensifier {
 							
 							flip(current_solution, t4,t1);
 
-							//TODO valutare l'uso di clear()
 							added_Edges = new HashSet<Edge>();
 							added_Edges.add(y1);
 							
@@ -526,7 +522,7 @@ public class LKIntesifier implements Intensifier {
 										best_gain = G3_star;
 										
 										//aggiorna il numero di archi scambati
-										k = 3;
+										//k = 3;
 											
 										//non c'è bisogno di fare backtrack
 										backtrack = false;
@@ -545,13 +541,13 @@ public class LKIntesifier implements Intensifier {
 										
 									Edge yi = null;
 									
-									int gi;
+									//int gi;
 									
 									int Gi = 0;
 									
 									if(yi_pair!=null){
 										yi = yi_pair.edge;
-										gi = yi_pair.gain;
+										//gi = yi_pair.gain;
 										Gi = yi_pair.part_gain;
 										
 										y_Edges[i-1] = yi;
@@ -604,7 +600,7 @@ public class LKIntesifier implements Intensifier {
 											best_gain = Gi_star;
 											
 											//aggiorna il numero di archi scambati
-											k = i;
+											//k = i;
 												
 											//non c'è bisogno di fare backtrack
 											backtrack = false;
@@ -617,7 +613,7 @@ public class LKIntesifier implements Intensifier {
 										
 										if(yi_pair!=null){
 											yi = yi_pair.edge;
-											gi = yi_pair.gain;
+											//gi = yi_pair.gain;
 											Gi = yi_pair.part_gain;
 											
 											y_Edges[i-1] = yi;
@@ -636,7 +632,6 @@ public class LKIntesifier implements Intensifier {
 									//flip(current_solution,t4,t1);
 									//flip(current_solution,t5,t4);
 									
-									//TODO valutare l'uso di clear()
 									added_Edges = new HashSet<Edge>();
 									added_Edges.add(y1);
 									added_Edges.add(y2);
@@ -671,7 +666,7 @@ public class LKIntesifier implements Intensifier {
 								Edge y3 = null;
 								
 								//guadagno g3
-								int g3;
+								//int g3;
 								
 								//guadagno totale G3
 								int G3 = 0;
@@ -680,7 +675,7 @@ public class LKIntesifier implements Intensifier {
 								
 								if(y3_pair!=null){
 									y3 = y3_pair.edge_pair.edge;
-									g3 = y3_pair.edge_pair.gain;
+									//g3 = y3_pair.edge_pair.gain;
 									G3 = y3_pair.edge_pair.part_gain;
 									
 									//registra y3 e G3
@@ -776,7 +771,7 @@ public class LKIntesifier implements Intensifier {
 									best_gain = G4_star;
 									
 									//aggiorna il numero di archi scambati
-									k = 4;
+									//k = 4;
 										
 									//non c'è bisogno di fare backtrack
 									backtrack = false;
@@ -795,13 +790,13 @@ public class LKIntesifier implements Intensifier {
 									
 								Edge yi = null;
 								
-								int gi;
+								//int gi;
 								
 								int Gi = 0;
 								
 								if(yi_pair!=null){
 									yi = yi_pair.edge;
-									gi = yi_pair.gain;
+									//gi = yi_pair.gain;
 									Gi = yi_pair.part_gain;
 									
 									//registra yi e Gi
@@ -855,7 +850,7 @@ public class LKIntesifier implements Intensifier {
 										best_gain = Gi_star;
 										
 										//aggiorna il numero di archi scambati
-										k = i;
+										//k = i;
 											
 										//non c'è bisogno di fare backtrack
 										backtrack = false;
@@ -868,7 +863,7 @@ public class LKIntesifier implements Intensifier {
 									
 									if(yi_pair!=null){
 										yi = yi_pair.edge;
-										gi = yi_pair.gain;
+										//gi = yi_pair.gain;
 										Gi = yi_pair.part_gain;
 										
 										//registra yi e Gi
@@ -889,7 +884,6 @@ public class LKIntesifier implements Intensifier {
 							
 							//flip(current_solution, t4,t1);
 							
-							//TODO valutare l'uso di clear()
 							added_Edges = new HashSet<Edge>();
 							added_Edges.add(y1);
 							
@@ -977,7 +971,6 @@ public class LKIntesifier implements Intensifier {
 			
 			Edge x2_prev = createEdge(t4_prev, t3);
 			
-			//TODO valutare i risultati usando come criterio il guadagno massimo ottenibile
 			Edge x2 = x2_next.getLength() < x2_prev.getLength() ? x2_next : x2_prev;
 			
 			//potenziale arco y1
@@ -1185,7 +1178,7 @@ public class LKIntesifier implements Intensifier {
 				//t5 è tra t2 e t3
 				
 				//si possono avere due archi x3, quindi l'ottimalità è valutata rispetto a
-				//quello più corto TODO valutare i risultati usando il più lungo
+				//quello più corto 
 				
 				City t6_next = next(current_solution, t5);
 				City t6_prev = prev(current_solution, t5);

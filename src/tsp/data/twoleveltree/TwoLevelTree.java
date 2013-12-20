@@ -386,13 +386,13 @@ public class TwoLevelTree implements Solution {
 					Client left = cl_b;
 					Client next_left = next_b;
 					
-					Client right = cl_a;
+					//Client right = cl_a;
 					Client next_right = next_a;
 					
 					if(p.reverse){
 						left = next_a;
 						next_left = cl_a;
-						right = next_b;
+						//right = next_b;
 						next_right = cl_b;
 					}
 					
@@ -1303,7 +1303,6 @@ public class TwoLevelTree implements Solution {
 	
 	@Override
 	public City startFrom() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 	
@@ -1312,13 +1311,11 @@ public class TwoLevelTree implements Solution {
 	
 	@Override
 	public void updateLength(int delta) {
-		// TODO Auto-generated method stub
 
 	}
 
 	@Override
 	public void setLength(int length) {
-		// TODO Auto-generated method stub
 
 	}
 

@@ -1,6 +1,5 @@
 package tsp.lk;
 
-import tsp.data.twoleveltree.TwoLevelTree;
 import tsp.model.*;
 import tsp.tabusearch.TSSolution;
 
