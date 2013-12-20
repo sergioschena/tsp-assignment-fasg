@@ -1,12 +1,10 @@
 package tsp.pso;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Random;
 
 import tsp.data.twoleveltree.TwoLevelTree;
-import tsp.initialsolution.NearestNeighbor;
 import tsp.lk.LKIntesifier;
 import tsp.model.*;
 
@@ -16,7 +14,6 @@ public class Test_PSO {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
 		
 		
 		
@@ -79,7 +76,6 @@ class Dummy_Intensifier implements Intensifier{
 
 	@Override
 	public Solution improve(Solution start) {
-		// TODO Auto-generated method stub
 		return start;
 	}
 	
@@ -112,7 +108,6 @@ class Dummy_generator implements InitialSolutionGenerator{
 
 	@Override
 	public City[] generate(int k) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 	
