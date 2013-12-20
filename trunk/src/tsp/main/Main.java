@@ -188,6 +188,39 @@ public class Main {
 				System.out.println("Error "+e.getMessage());
 		        System.exit(-1);
 			}
-		}
+		
+	 }
+	 
+	 //Metodo per la selezione del parametro MaxT1
+	 
+	private int getMaxT1Param(int n){
+		int param;
+		
+		if(n<100){
+			param=10;
+		} else if(n<152){
+			param=linearInterpolation(100,10,152,30,n);
+		} else if(n<195){
+			param=30;
+		} else if(n<318){
+			param=linearInterpolation(195, 30, 318, 50, n);
+		} else if(n<417){
+			param=50;
+		} else if(n<575){
+			param=linearInterpolation(417, 50, 575, 70, n);
+		} else if(n<724){
+			param=70;
+		} else if(n<783){
+			param=linearInterpolation(724, 70, 783, 90, n);
+		} else if(n<1002){
+			param=linearInterpolation(783, 90, 1002, 100, n);
+		} else {param=100;}
+		
+		return param;
+	}
 
+	private int linearInterpolation(int xa, int ya, int xb, int yb, int x) {
+		
+		return ((x-xb)/(xa-xb)*ya)-((x-xa)/(xa-xb)*yb);
+	}
 }
