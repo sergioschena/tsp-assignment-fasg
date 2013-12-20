@@ -10,6 +10,33 @@ import tsp.instances.*;
 import tsp.model.CityManager;
 
 public class GA_LK_ParamTester {
+	
+		//ESITO FINALE: 
+		//				-POPULATION SIZE, fisso a 10
+		//				-ELITE SIZE, fisso a 5
+		//				-GENERETION COUNT, fisso a 25
+		//				-MAXGLOBALITERATIONS, fisso a 100000 (10^5)
+		//				-MAX_T1 variabile
+		
+		//La variazione di MAX_T1 conviene farla con nua funzione a tratti e interpolare tra
+		//valori ottenuti nei test. Di seguito i punti della funzione
+		
+		//---------------
+		//	n	| Iter  |
+		//---------------
+		//	51	|	10	|
+		//	52	|	10	|
+		//	76	|	10	|
+		//	100	|	10	|
+		//	152	|	30	|
+		//	195	|	30	|
+		//	318	|	50	|
+		//	417	|	50	|
+		//	575	|	70	|
+		//	657	|	70	|
+		//	724	|	70	|
+		//	783	|	90	|
+		// 1002	|	100	|
 
 	//Test di diversi parametri dell'algoritmo GA-LK 
 	public static void main(String[] args) {
