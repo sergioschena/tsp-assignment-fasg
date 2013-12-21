@@ -54,6 +54,8 @@ public class Main {
     		StringBuffer csvLine = new StringBuffer();
     		Instance instance = new Instance(dirName, istancesNames.get(i));
     		
+    		paramsMap.put("LKMaxT1", new Integer(getMaxT1Param(instance.N)).toString());
+    		
     		// risoluzione dell'istanza    		
     		GALKSolver solver = new GALKSolver(instance, K);
     		solver.setParamByMap(paramsMap);
@@ -193,7 +195,7 @@ public class Main {
 	 
 	 //Metodo per la selezione del parametro MaxT1
 	 
-	private int getMaxT1Param(int n){
+	private static int getMaxT1Param(int n){
 		int param;
 		
 		if(n<100){
@@ -219,7 +221,7 @@ public class Main {
 		return param;
 	}
 
-	private int linearInterpolation(int xa, int ya, int xb, int yb, int x) {
+	private static int linearInterpolation(int xa, int ya, int xb, int yb, int x) {
 		
 		return ((x-xb)/(xa-xb)*ya)-((x-xa)/(xa-xb)*yb);
 	}
