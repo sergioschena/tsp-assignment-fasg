@@ -46,7 +46,7 @@ public class Instance {
 			line = br.readLine();	
 			line = br.readLine();	
 			line = br.readLine();
-			StringTokenizer st = new StringTokenizer(line);	
+			StringTokenizer st = new StringTokenizer(line," :\t\n\r\f");	
 			token = st.nextToken();
 			token = st.nextToken();		
 			this.N = Integer.parseInt(token);
