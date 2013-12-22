@@ -223,6 +223,6 @@ public class Main {
 
 	private static int linearInterpolation(int xa, int ya, int xb, int yb, int x) {
 		
-		return ((x-xb)/(xa-xb)*ya)-((x-xa)/(xa-xb)*yb);
+		return (int) ((1.0*(x-xb)/(xa-xb)*ya)-(1.0*(x-xa)/(xa-xb)*yb));
 	}
 }
